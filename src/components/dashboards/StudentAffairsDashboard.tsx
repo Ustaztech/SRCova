@@ -46,6 +46,9 @@ export const StudentAffairsDashboard: React.FC<StudentAffairsDashboardProps> = (
 
   useEffect(() => {
     loadData();
+    const handleUpdate = () => loadData();
+    window.addEventListener('srcova:data_changed', handleUpdate);
+    return () => window.removeEventListener('srcova:data_changed', handleUpdate);
   }, []);
 
   // Metrics

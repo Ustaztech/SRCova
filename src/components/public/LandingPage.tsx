@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrandLogo } from '../common/BrandLogo';
+import { WelcomeModal } from './WelcomeModal';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -27,6 +28,7 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPortal }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState<boolean>(true);
 
   const faqs = [
     {
@@ -53,8 +55,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
 
   return (
     <div className="min-h-screen bg-[#F7F9F8] text-[#202B28] font-sans">
+      {/* Top University Announcement Bar */}
+      <div className="bg-[#002D20] text-white py-2.5 px-4 text-xs border-b border-[#075B40]/40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 truncate">
+            <span className="inline-block w-2 h-2 rounded-full bg-[#D5AC49] animate-pulse shrink-0" />
+            <span className="font-bold text-[#D5AC49]">University Notice:</span>
+            <span className="hidden sm:inline text-emerald-100 truncate">
+              2025/2026 Student Representative Council (SRC) Digital Merit Selection Exercise is officially live.
+            </span>
+          </div>
+          <button
+            onClick={() => setIsWelcomeModalOpen(true)}
+            className="text-[11px] font-bold text-[#D5AC49] hover:underline flex items-center gap-1.5 shrink-0"
+          >
+            <span>Read Welcome Message</span>
+            <Sparkles className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
       {/* Navigation Bar */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xs">
+      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <BrandLogo variant="horizontal" height={44} />
@@ -522,6 +544,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
           </div>
         </div>
       </footer>
+
+      {/* Welcome Pop-up Modal */}
+      <WelcomeModal
+        isOpen={isWelcomeModalOpen}
+        onClose={() => setIsWelcomeModalOpen(false)}
+        onGoToLogin={onGoToLogin}
+        onExploreWorkflow={() => {
+          const el = document.getElementById('workflow');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      />
     </div>
   );
 };

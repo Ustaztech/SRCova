@@ -54,6 +54,9 @@ export const DepartmentDashboard: React.FC<DepartmentDashboardProps> = ({
 
   useEffect(() => {
     loadData();
+    const handleUpdate = () => loadData();
+    window.addEventListener('srcova:data_changed', handleUpdate);
+    return () => window.removeEventListener('srcova:data_changed', handleUpdate);
   }, [currentUser]);
 
   // Department metrics
@@ -290,50 +293,62 @@ export const DepartmentDashboard: React.FC<DepartmentDashboardProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {candidates.map((cand) => {
-                const hasNomination = nominations.some((n) => n.studentId === cand.id);
-                return (
-                  <tr key={cand.id} className="hover:bg-gray-50/80 transition-colors">
-                    <td className="px-4 py-3 font-semibold text-gray-900 flex items-center gap-2.5">
-                      <img
-                        src={cand.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                        alt={cand.fullName}
-                        className="w-7 h-7 rounded-lg object-cover border border-[#075B40]"
-                      />
-                      <span>{cand.fullName}</span>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-gray-600">{cand.matricNumber}</td>
-                    <td className="px-4 py-3">
-                      <span className="font-bold text-gray-800">{cand.level}</span> •{' '}
-                      <span className="text-[#075B40] font-semibold">{cand.cgpa.toFixed(2)} CGPA</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
-                          cand.isCourseRep
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : 'bg-gray-100 text-gray-600 border-gray-200'
-                        }`}
-                      >
-                        {cand.isCourseRep ? 'Yes' : 'No'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-emerald-700 font-semibold">Cleared</td>
-                    <td className="px-4 py-3 text-right">
-                      {hasNomination ? (
-                        <span className="text-[11px] text-gray-400 italic">Nominated</span>
-                      ) : (
-                        <button
-                          onClick={() => onOpenCreateNomination(cand.id)}
-                          className="px-2.5 py-1 text-xs font-bold text-white bg-[#075B40] hover:bg-[#003B2B] rounded-lg transition-colors"
+              {candidates.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
+                    <Users className="w-7 h-7 mx-auto mb-1.5 text-gray-300" />
+                    <p className="font-semibold text-gray-600 text-xs">No candidate students registered yet</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Click "+ Register Student" above to enter prospective student candidates from your department.
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                candidates.map((cand) => {
+                  const hasNomination = nominations.some((n) => n.studentId === cand.id);
+                  return (
+                    <tr key={cand.id} className="hover:bg-gray-50/80 transition-colors">
+                      <td className="px-4 py-3 font-semibold text-gray-900 flex items-center gap-2.5">
+                        <img
+                          src={cand.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
+                          alt={cand.fullName}
+                          className="w-7 h-7 rounded-lg object-cover border border-[#075B40]"
+                        />
+                        <span>{cand.fullName}</span>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-gray-600">{cand.matricNumber}</td>
+                      <td className="px-4 py-3">
+                        <span className="font-bold text-gray-800">{cand.level}</span> •{' '}
+                        <span className="text-[#075B40] font-semibold">{cand.cgpa.toFixed(2)} CGPA</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
+                            cand.isCourseRep
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : 'bg-gray-100 text-gray-600 border-gray-200'
+                          }`}
                         >
-                          Nominate
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                          {cand.isCourseRep ? 'Yes' : 'No'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-emerald-700 font-semibold">Cleared</td>
+                      <td className="px-4 py-3 text-right">
+                        {hasNomination ? (
+                          <span className="text-[11px] text-gray-400 italic">Nominated</span>
+                        ) : (
+                          <button
+                            onClick={() => onOpenCreateNomination(cand.id)}
+                            className="px-2.5 py-1 text-xs font-bold text-white bg-[#075B40] hover:bg-[#003B2B] rounded-lg transition-colors"
+                          >
+                            Nominate
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

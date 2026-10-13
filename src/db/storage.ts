@@ -41,7 +41,23 @@ import {
   INITIAL_AUDIT_LOGS,
 } from './seedData';
 
-const DB_PREFIX = 'srcova_db_v1_';
+const DB_PREFIX = 'srcova_prod_v2_';
+
+// Purge legacy mock data keys on startup
+try {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('srcova_db_v1_') || key === 'srcova_auth_user_id')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+  }
+} catch (e) {
+  console.warn('Storage purge warning:', e);
+}
 
 function getStored<T>(key: string, defaultVal: T): T {
   try {
@@ -60,6 +76,9 @@ function getStored<T>(key: string, defaultVal: T): T {
 function setStored<T>(key: string, val: T): void {
   try {
     localStorage.setItem(DB_PREFIX + key, JSON.stringify(val));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('srcova:data_changed', { detail: { key } }));
+    }
   } catch (e) {
     console.error(`Error writing ${key} to storage:`, e);
   }

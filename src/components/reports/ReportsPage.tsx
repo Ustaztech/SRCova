@@ -42,7 +42,7 @@ export const ReportsPage: React.FC = () => {
   const [nominations, setNominations] = useState<Nomination[]>([]);
   const [students, setStudents] = useState<Record<string, Student>>({});
 
-  useEffect(() => {
+  const loadData = () => {
     setFaculties(DatabaseService.getFaculties());
     setDepartments(DatabaseService.getDepartments());
     setNominations(DatabaseService.getNominations());
@@ -53,6 +53,13 @@ export const ReportsPage: React.FC = () => {
       map[s.id] = s;
     });
     setStudents(map);
+  };
+
+  useEffect(() => {
+    loadData();
+    const handleUpdate = () => loadData();
+    window.addEventListener('srcova:data_changed', handleUpdate);
+    return () => window.removeEventListener('srcova:data_changed', handleUpdate);
   }, []);
 
   const handleFacultyChange = (fId: string) => {

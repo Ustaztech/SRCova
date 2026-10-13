@@ -108,55 +108,11 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Public Site</span>
           </button>
 
-          {/* Quick Demo Role Switcher */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowRoleDropdown(!showRoleDropdown);
-                setShowNotifDropdown(false);
-                setShowProfileDropdown(false);
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#075B40]/10 text-[#075B40] border border-[#075B40]/20 hover:bg-[#075B40]/15 transition-colors"
-              title="Quickly switch between official NSUK demo roles to test every workflow step"
-            >
-              <UserCheck className="w-3.5 h-3.5 text-[#075B40]" />
-              <span className="hidden sm:inline">Role: {currentRoleMeta?.label}</span>
-              <span className="sm:hidden">Role</span>
-              <ChevronDown className="w-3.5 h-3.5" />
-            </button>
-
-            {showRoleDropdown && (
-              <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-50 animate-scale-up">
-                <div className="px-3 py-2 border-b border-gray-100">
-                  <p className="text-xs font-bold text-gray-900">Switch Demonstration Account</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">
-                    Test the complete nomination and verification workflow across roles.
-                  </p>
-                </div>
-                <div className="py-1">
-                  {demoUsers.map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => {
-                        switchUser(u.id);
-                        setShowRoleDropdown(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center justify-between hover:bg-gray-50 transition-colors ${
-                        currentUser?.id === u.id ? 'bg-[#075B40]/5 font-semibold text-[#075B40]' : 'text-gray-700'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-semibold text-gray-900">{u.fullName}</div>
-                        <div className="text-[11px] text-gray-500">{u.title || u.role}</div>
-                      </div>
-                      {currentUser?.id === u.id && (
-                        <CheckCircle className="w-4 h-4 text-[#075B40]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+          {/* Active Institutional Role Badge */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#075B40]/10 text-[#075B40] border border-[#075B40]/20">
+            <UserCheck className="w-3.5 h-3.5 text-[#075B40]" />
+            <span className="hidden sm:inline">{currentRoleMeta?.label}</span>
+            <span className="sm:hidden">{currentUser?.role.split('_')[0]}</span>
           </div>
 
           {/* Notifications Bell */}

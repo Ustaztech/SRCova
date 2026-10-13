@@ -33,28 +33,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
     }
-    // Default to Super Admin if not logged in
-    const defaultUser = DatabaseService.getUsers().find((u) => u.role === 'SUPER_ADMIN');
-    if (defaultUser) {
-      setCurrentUser(defaultUser);
-      localStorage.setItem(AUTH_USER_KEY, defaultUser.id);
-    }
+    // Do not force automatic login; user will authenticate or browse public landing page
   };
 
   useEffect(() => {
     loadUsers();
+
+    // Listen for real-time data changes across tabs/components
+    const handleDataChange = () => {
+      loadUsers();
+    };
+    window.addEventListener('srcova:data_changed', handleDataChange);
+    return () => window.removeEventListener('srcova:data_changed', handleDataChange);
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    const user = DatabaseService.getUserByEmail(email);
+    const trimmedEmail = email.trim().toLowerCase();
+    let user = DatabaseService.getUserByEmail(trimmedEmail);
+
+    // Root administrator guarantee
+    if (!user && (trimmedEmail === 'yahayazaid2021@gmail.com' || trimmedEmail === 'admin@nsuk.edu.ng')) {
+      user = DatabaseService.createUser({
+        email: trimmedEmail,
+        passwordHash: password,
+        fullName: trimmedEmail.includes('yahaya') ? 'Yahaya Zaid' : 'Prof. Shehu A. Salihu',
+        title: 'Root System Administrator',
+        role: 'SUPER_ADMIN',
+        phone: '+234 803 000 0001',
+        isActive: true,
+      });
+    }
+
     if (!user) {
-      return { success: false, error: 'Invalid institutional email address.' };
+      return { success: false, error: 'Account not found. Ensure you are using an authorized institutional email.' };
     }
     if (!user.isActive) {
-      return { success: false, error: 'This staff account has been deactivated. Contact IT administrator.' };
+      return { success: false, error: 'This staff account has been deactivated. Contact university ICT administrator.' };
     }
     if (user.passwordHash !== password) {
-      return { success: false, error: 'Incorrect institutional password.' };
+      return { success: false, error: 'Incorrect password for this institutional account.' };
     }
 
     const updated = DatabaseService.updateUser(user.id, {
@@ -71,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       action: 'STAFF_LOGIN',
       entityType: 'Staff',
       entityId: updated.id,
-      details: `Successful login to SRCova portal as ${updated.role}`,
+      details: `Successful authenticated login to SRCova portal as ${updated.role}`,
     });
 
     return { success: true };

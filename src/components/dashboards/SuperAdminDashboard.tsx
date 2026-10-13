@@ -45,11 +45,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [staffUsers, setStaffUsers] = useState<User[]>([]);
 
-  useEffect(() => {
+  const loadData = () => {
     setCandidates(DatabaseService.getStudents());
     setNominations(DatabaseService.getNominations());
     setFaculties(DatabaseService.getFaculties());
     setStaffUsers(DatabaseService.getUsers());
+  };
+
+  useEffect(() => {
+    loadData();
+    const handleUpdate = () => loadData();
+    window.addEventListener('srcova:data_changed', handleUpdate);
+    return () => window.removeEventListener('srcova:data_changed', handleUpdate);
   }, []);
 
   // Compute live metrics
@@ -328,40 +335,52 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {recentNominations.map((nom) => {
-                const s = studentMap.get(nom.studentId);
-                return (
-                  <tr key={nom.id} className="hover:bg-gray-50/80 transition-colors">
-                    <td className="px-4 py-3 font-mono font-bold text-[#075B40]">
-                      {nom.referenceNumber}
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-gray-900 flex items-center gap-2">
-                      <img
-                        src={s?.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                        alt={s?.fullName}
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                      <span>{s?.fullName}</span>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-gray-600">{s?.matricNumber}</td>
-                    <td className="px-4 py-3 text-gray-800">{nom.proposedPosition}</td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={nom.status} size="sm" />
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {new Date(nom.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => onOpenNomination(nom)}
-                        className="text-[#075B40] hover:underline font-semibold"
-                      >
-                        Inspect
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {recentNominations.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
+                    <FileText className="w-7 h-7 mx-auto mb-1.5 text-gray-300" />
+                    <p className="font-semibold text-gray-600 text-xs">No candidate nominations registered yet</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Real-time submissions will populate here as Departmental Officers register and submit candidates.
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                recentNominations.map((nom) => {
+                  const s = studentMap.get(nom.studentId);
+                  return (
+                    <tr key={nom.id} className="hover:bg-gray-50/80 transition-colors">
+                      <td className="px-4 py-3 font-mono font-bold text-[#075B40]">
+                        {nom.referenceNumber}
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-gray-900 flex items-center gap-2">
+                        <img
+                          src={s?.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
+                          alt={s?.fullName}
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                        <span>{s?.fullName}</span>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-gray-600">{s?.matricNumber}</td>
+                      <td className="px-4 py-3 text-gray-800">{nom.proposedPosition}</td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={nom.status} size="sm" />
+                      </td>
+                      <td className="px-4 py-3 text-gray-500">
+                        {new Date(nom.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={() => onOpenNomination(nom)}
+                          className="text-[#075B40] hover:underline font-semibold"
+                        >
+                          Inspect
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

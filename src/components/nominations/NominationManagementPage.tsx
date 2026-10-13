@@ -65,6 +65,9 @@ export const NominationManagementPage: React.FC<NominationManagementPageProps> =
 
   useEffect(() => {
     loadData();
+    const handleUpdate = () => loadData();
+    window.addEventListener('srcova:data_changed', handleUpdate);
+    return () => window.removeEventListener('srcova:data_changed', handleUpdate);
   }, [currentUser]);
 
   const filteredNominations = nominations.filter((nom) => {

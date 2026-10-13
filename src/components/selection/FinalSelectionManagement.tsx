@@ -57,6 +57,9 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
 
   useEffect(() => {
     loadData();
+    const handleUpdate = () => loadData();
+    window.addEventListener('srcova:data_changed', handleUpdate);
+    return () => window.removeEventListener('srcova:data_changed', handleUpdate);
   }, []);
 
   // Filter candidates recommended for selection or already selected

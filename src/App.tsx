@@ -42,8 +42,14 @@ const AppContent: React.FC = () => {
   const { currentUser, isAuthenticated } = useAuth();
   const { showToast } = useNotifications();
 
-  // Navigation State
-  const [currentView, setCurrentView] = useState<string>('dashboard');
+  // Navigation State (defaults to home page for visitors, dashboard for active staff sessions)
+  const [currentView, setCurrentView] = useState<string>(() => {
+    try {
+      return localStorage.getItem('srcova_auth_user_id') ? 'dashboard' : 'public-landing';
+    } catch {
+      return 'public-landing';
+    }
+  });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Modal States
@@ -58,13 +64,13 @@ const AppContent: React.FC = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = useState(false);
 
-  // Handle Public Landing Page
+  // Handle Public Landing Page (Home Page)
   if (currentView === 'public-landing') {
     return (
       <>
         <LandingPage
           onGoToLogin={() => setCurrentView('login')}
-          onEnterPortal={() => setCurrentView('dashboard')}
+          onEnterPortal={() => setCurrentView(isAuthenticated ? 'dashboard' : 'login')}
         />
         <ToastContainer />
       </>

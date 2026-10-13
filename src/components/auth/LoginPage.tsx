@@ -11,10 +11,11 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  HelpCircle,
   Globe,
+  Info,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
-import { UserRole } from '../../types';
 
 interface LoginPageProps {
   onSuccess: () => void;
@@ -22,14 +23,15 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }) => {
-  const { login, demoUsers, switchUser } = useAuth();
+  const { login } = useAuth();
   const { showToast } = useNotifications();
 
-  const [email, setEmail] = useState('admin@nsuk.edu.ng');
-  const [password, setPassword] = useState('Admin@SRCova2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showDirectory, setShowDirectory] = useState(false);
 
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
@@ -50,18 +52,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
       setErrorMessage(res.error || 'Failed to authenticate.');
       showToast('danger', 'Login Failed', res.error || 'Invalid credentials.');
     }
-  };
-
-  const handleSelectDemoAccount = (u: any) => {
-    setEmail(u.email);
-    setPassword(u.passwordHash);
-    setErrorMessage('');
-  };
-
-  const handleQuickLogin = (u: any) => {
-    switchUser(u.id);
-    showToast('success', 'Logged in as Demo User', `Active as ${u.fullName} (${u.role})`);
-    onSuccess();
   };
 
   const handleResetSubmit = (e: React.FormEvent) => {
@@ -94,11 +84,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
         <div className="w-full max-w-md bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden animate-scale-up">
           {/* Card Header */}
           <div className="bg-gradient-to-r from-[#003B2B] to-[#075B40] px-6 py-6 text-white text-center">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[#D5AC49] text-[11px] font-bold border border-white/20 mb-2">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>NSUK Secure Staff Portal</span>
+            </div>
             <h2 className="text-xl font-bold font-display tracking-tight text-white">
               Authorized Staff Sign In
             </h2>
-            <p className="text-xs text-[#D5AC49] mt-1 font-medium">
-              Nasarawa State University, Keffi (NSUK)
+            <p className="text-xs text-emerald-100 mt-1 font-medium">
+              Nasarawa State University, Keffi
             </p>
           </div>
 
@@ -120,10 +114,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
                   <input
                     type="email"
                     required
-                    placeholder="officer@nsuk.edu.ng"
+                    placeholder="officer@nsuk.edu.ng or admin@nsuk.edu.ng"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full text-xs pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#075B40]/20 focus:border-[#075B40] transition-all"
+                    className="w-full text-xs pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#075B40]/20 focus:border-[#075B40] transition-all bg-white"
                   />
                 </div>
               </div>
@@ -144,9 +138,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
+                    placeholder="••••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full text-xs pl-9 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#075B40]/20 focus:border-[#075B40] transition-all"
+                    className="w-full text-xs pl-9 pr-10 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#075B40]/20 focus:border-[#075B40] transition-all bg-white"
                   />
                   <button
                     type="button"
@@ -169,36 +164,74 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
               </button>
             </form>
 
-            {/* Quick Demo Credentials Panel */}
+            {/* Institutional Access Guidelines & Directory */}
             <div className="pt-4 border-t border-gray-100">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-2">
-                Demonstration Accounts (Click to Fill & Test)
-              </span>
+              <button
+                type="button"
+                onClick={() => setShowDirectory(!showDirectory)}
+                className="w-full flex items-center justify-between text-[11px] font-bold text-[#075B40] hover:text-[#003B2B] transition-colors py-1"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Info className="w-3.5 h-3.5 text-[#D5AC49]" />
+                  <span>Official University Accounts Directory</span>
+                </span>
+                {showDirectory ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
 
-              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                {demoUsers.map((u) => (
-                  <div
-                    key={u.id}
-                    onClick={() => handleSelectDemoAccount(u)}
-                    className="p-2 rounded-xl bg-gray-50 hover:bg-emerald-50/70 border border-gray-200/80 cursor-pointer flex items-center justify-between text-xs transition-colors"
-                  >
-                    <div>
-                      <div className="font-bold text-gray-900 leading-tight">{u.fullName}</div>
-                      <div className="text-[10px] text-gray-500">{u.title || u.role}</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleQuickLogin(u);
-                      }}
-                      className="px-2 py-1 text-[10px] font-bold text-[#075B40] bg-white border border-gray-200 hover:bg-[#075B40] hover:text-white rounded-lg transition-colors"
-                    >
-                      Instant Login
-                    </button>
-                  </div>
-                ))}
-              </div>
+              {showDirectory && (
+                <div className="mt-2.5 p-3 rounded-2xl bg-[#F7F9F8] border border-gray-200/80 text-[11px] text-gray-600 space-y-2 animate-fade-in">
+                  <p className="font-semibold text-gray-800">
+                    Active Institutional Accounts (Configured for 2025/2026 Session):
+                  </p>
+                  <ul className="space-y-1.5 text-[10.5px]">
+                    <li className="flex justify-between items-center py-1 border-b border-gray-200/60">
+                      <div>
+                        <strong className="text-gray-900">Root Super Admin:</strong>
+                        <div className="font-mono text-gray-500">yahayazaid2021@gmail.com</div>
+                      </div>
+                      <span className="font-mono bg-white px-1.5 py-0.5 rounded border text-gray-600">Admin@SRCova2026</span>
+                    </li>
+                    <li className="flex justify-between items-center py-1 border-b border-gray-200/60">
+                      <div>
+                        <strong className="text-gray-900">ICT Directorate Admin:</strong>
+                        <div className="font-mono text-gray-500">admin@nsuk.edu.ng</div>
+                      </div>
+                      <span className="font-mono bg-white px-1.5 py-0.5 rounded border text-gray-600">Admin@SRCova2026</span>
+                    </li>
+                    <li className="flex justify-between items-center py-1 border-b border-gray-200/60">
+                      <div>
+                        <strong className="text-gray-900">Dean of Student Affairs:</strong>
+                        <div className="font-mono text-gray-500">dsa@nsuk.edu.ng</div>
+                      </div>
+                      <span className="font-mono bg-white px-1.5 py-0.5 rounded border text-gray-600">Dsa@SRCova2026</span>
+                    </li>
+                    <li className="flex justify-between items-center py-1 border-b border-gray-200/60">
+                      <div>
+                        <strong className="text-gray-900">Dean / Faculty Officer:</strong>
+                        <div className="font-mono text-gray-500">dean.nas@nsuk.edu.ng</div>
+                      </div>
+                      <span className="font-mono bg-white px-1.5 py-0.5 rounded border text-gray-600">Dean@SRCova2026</span>
+                    </li>
+                    <li className="flex justify-between items-center py-1 border-b border-gray-200/60">
+                      <div>
+                        <strong className="text-gray-900">HOD / Dept Officer:</strong>
+                        <div className="font-mono text-gray-500">hod.cs@nsuk.edu.ng</div>
+                      </div>
+                      <span className="font-mono bg-white px-1.5 py-0.5 rounded border text-gray-600">Hod@SRCova2026</span>
+                    </li>
+                    <li className="flex justify-between items-center py-1">
+                      <div>
+                        <strong className="text-gray-900">Vice-Chancellor / Mgmt:</strong>
+                        <div className="font-mono text-gray-500">management@nsuk.edu.ng</div>
+                      </div>
+                      <span className="font-mono bg-white px-1.5 py-0.5 rounded border text-gray-600">Mgmt@SRCova2026</span>
+                    </li>
+                  </ul>
+                  <p className="text-[10px] text-gray-400 italic pt-1">
+                    Staff accounts can also be created, modified, or deactivated directly by administrators via the Staff Management portal.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
