@@ -1,3 +1,4 @@
+import { CandidateAvatar } from '../common/CandidateAvatar';
 import React from 'react';
 import { Modal } from '../common/Modal';
 import { Nomination, Student, Faculty, Department } from '../../types';
@@ -94,11 +95,7 @@ export const NominationReceiptModal: React.FC<NominationReceiptModalProps> = ({
         {/* Candidate Bio Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center my-4 pb-4 border-b border-gray-100">
           <div className="sm:col-span-1 flex justify-center">
-            <img
-              src={student?.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-              alt={student?.fullName}
-              className="w-24 h-28 object-cover rounded-lg border-2 border-[#075B40] shadow-xs"
-            />
+            <CandidateAvatar src={student?.passportPhoto} name={student?.fullName} size="sm" />
           </div>
           <div className="sm:col-span-3 grid grid-cols-2 gap-y-2.5 gap-x-4 text-xs">
             <div>

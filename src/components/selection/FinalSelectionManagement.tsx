@@ -1,3 +1,4 @@
+import { CandidateAvatar } from '../common/CandidateAvatar';
 import React, { useState, useEffect } from 'react';
 import { DatabaseService } from '../../db/storage';
 import { useAuth } from '../../context/AuthContext';
@@ -72,7 +73,7 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
   const handleOpenConfirm = (nom: Nomination) => {
     setSelectedNomination(nom);
     const randNum = Math.floor(10 + Math.random() * 90);
-    setResolutionNumber(`NSUK/SRC/RES/2026/0${randNum}`);
+    setResolutionNumber(`SRCOVA/RES/2026/0${randNum}`);
     setExecutiveNotes('Ratified by Vice-Chancellor selection panel.');
   };
 
@@ -118,7 +119,7 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
 
     try {
       recommendedList.forEach((nom, idx) => {
-        const resNo = `NSUK/SRC/RES/2026/0${20 + idx}`;
+        const resNo = `SRCOVA/RES/2026/0${20 + idx}`;
         DatabaseService.confirmSelection(
           nom.id,
           resNo,
@@ -249,10 +250,10 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
                   className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/80 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <img
-                      src={student?.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                      alt={student?.fullName}
-                      className="w-12 h-12 rounded-xl object-cover border-2 border-[#075B40] shrink-0"
+                    <CandidateAvatar
+                      src={student?.passportPhoto}
+                      name={student?.fullName}
+                      size="lg"
                     />
                     <div>
                       <div className="flex items-center gap-2">
@@ -342,11 +343,7 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
                   return (
                     <tr key={nom.id} className="hover:bg-gray-50/80 transition-colors">
                       <td className="px-4 py-3 font-semibold text-gray-900 flex items-center gap-2.5">
-                        <img
-                          src={student?.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                          alt={student?.fullName}
-                          className="w-8 h-8 rounded-lg object-cover border border-[#075B40]"
-                        />
+                        <CandidateAvatar src={student?.passportPhoto} name={student?.fullName} size="sm" />
                         <span>{student?.fullName}</span>
                       </td>
                       <td className="px-4 py-3 font-mono text-gray-600">{student?.matricNumber}</td>
@@ -355,7 +352,7 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
                         {nom.proposedPosition}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-emerald-800">
-                        {sel?.resolutionNumber || 'NSUK/SRC/RES/2026/014'}
+                        {sel?.resolutionNumber || 'SRCOVA/RES/2026/014'}
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status="Selected" size="sm" />

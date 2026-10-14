@@ -16,7 +16,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   // Official Variation 2: Flat Vector-Style Logo
   // Official Variation 3: Premium PNG Logo
   let src = '/assets/branding/logo-horizontal.png';
-  let alt = 'SRCova — NSUK Student Representative Selection System';
+  let alt = 'SRCova — Student Representative Selection Platform (Research Project · Case Study: NSUK)';
 
   if (variant === 'vector') {
     src = '/assets/branding/logo-vector.png';

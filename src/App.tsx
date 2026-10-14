@@ -293,10 +293,10 @@ const AppContent: React.FC = () => {
           <footer className="py-4 px-6 border-t border-gray-200/80 bg-white text-center text-xs text-gray-500">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
               <span>
-                SRCova — Nasarawa State University, Keffi (NSUK) • Student Representative Selection System
+                SRCova — Academic Research Project (Case Study: NSUK) • Digital Merit Selection Framework
               </span>
               <span className="font-semibold text-[#075B40]">
-                Academic MVP • Institutional Prototype
+                Academic Research Prototype • Institutional Pilot
               </span>
             </div>
           </footer>

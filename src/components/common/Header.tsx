@@ -71,10 +71,10 @@ export const Header: React.FC<HeaderProps> = ({
             <BrandLogo variant="horizontal" height={36} className="cursor-pointer" />
             <div className="hidden sm:block ml-2 pl-3 border-l border-gray-200">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">
-                Nasarawa State University, Keffi
+                Research Project · Case Study: NSUK
               </span>
               <span className="text-xs font-bold text-[#075B40] block">
-                Official Selection Portal
+                Digital Merit Selection Platform
               </span>
             </div>
           </div>

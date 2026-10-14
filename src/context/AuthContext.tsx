@@ -51,17 +51,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const trimmedEmail = email.trim().toLowerCase();
     let user = DatabaseService.getUserByEmail(trimmedEmail);
 
-    // Root administrator guarantee
-    if (!user && (trimmedEmail === 'yahayazaid2021@gmail.com' || trimmedEmail === 'admin@nsuk.edu.ng')) {
-      user = DatabaseService.createUser({
-        email: trimmedEmail,
-        passwordHash: password,
-        fullName: trimmedEmail.includes('yahaya') ? 'Yahaya Zaid' : 'Prof. Shehu A. Salihu',
-        title: 'Root System Administrator',
-        role: 'SUPER_ADMIN',
-        phone: '+234 803 000 0001',
-        isActive: true,
-      });
+    // Sole administrator guarantee for support.srcover@gmail.com
+    if (trimmedEmail === 'support.srcover@gmail.com') {
+      if (!user) {
+        user = DatabaseService.createUser({
+          email: 'support.srcover@gmail.com',
+          passwordHash: password || 'Admin@SRCova2026',
+          fullName: 'System Administrator',
+          title: 'Lead System Administrator',
+          role: 'SUPER_ADMIN',
+          phone: '+234 800 000 0001',
+          isActive: true,
+        });
+      } else if (user.role !== 'SUPER_ADMIN') {
+        user = DatabaseService.updateUser(user.id, { role: 'SUPER_ADMIN', isActive: true });
+      }
     }
 
     if (!user) {

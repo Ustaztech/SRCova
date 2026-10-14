@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { CandidateAvatar } from '../common/CandidateAvatar';
 import { Modal } from '../common/Modal';
 import { DatabaseService } from '../../db/storage';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { Faculty, Department, Programme, Student } from '../../types';
-import { User, GraduationCap, FileCheck, CheckCircle2, AlertCircle, ArrowLeft, ArrowRight, Upload } from 'lucide-react';
+import { User, GraduationCap, FileCheck, CheckCircle2, AlertCircle, ArrowLeft, ArrowRight, Upload, Camera, Trash2, Image as ImageIcon } from 'lucide-react';
 
 interface CandidateRegistrationModalProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ export const CandidateRegistrationModal: React.FC<CandidateRegistrationModalProp
     gender: 'Male' as 'Male' | 'Female',
     email: '',
     phone: '',
-    passportPhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+    passportPhoto: '',
     facultyId: '',
     departmentId: '',
     programmeId: '',
@@ -47,6 +48,72 @@ export const CandidateRegistrationModal: React.FC<CandidateRegistrationModalProp
   const [departments, setDepartments] = useState<Department[]>([]);
   const [programmes, setProgrammes] = useState<Programme[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+
+  const processImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setPhotoError('Please select a valid image file (PNG, JPG, or WebP).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoError('Image file is too large. Please select a photo under 5MB.');
+      return;
+    }
+    setPhotoError(null);
+    setIsProcessingPhoto(true);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const MAX_DIM = 400;
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > MAX_DIM) {
+              h = Math.round((h * MAX_DIM) / w);
+              w = MAX_DIM;
+            }
+          } else {
+            if (h > MAX_DIM) {
+              w = Math.round((w * MAX_DIM) / h);
+              h = MAX_DIM;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+            setFormData((prev) => ({ ...prev, passportPhoto: dataUrl }));
+          } else {
+            setFormData((prev) => ({ ...prev, passportPhoto: e.target?.result as string }));
+          }
+        } catch {
+          setFormData((prev) => ({ ...prev, passportPhoto: e.target?.result as string }));
+        } finally {
+          setIsProcessingPhoto(false);
+        }
+      };
+      img.onerror = () => {
+        setPhotoError('Could not process this image file.');
+        setIsProcessingPhoto(false);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => {
+      setPhotoError('Failed to read image file.');
+      setIsProcessingPhoto(false);
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -233,12 +300,12 @@ export const CandidateRegistrationModal: React.FC<CandidateRegistrationModalProp
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Full Name (Surname First) *
+                  Full Name (Surname First, e.g. USMAN SABIU) *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Danjuma Ibrahim Farouq"
+                  placeholder="e.g. USMAN SABIU"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20 focus:border-[#075B40]"
@@ -284,7 +351,7 @@ export const CandidateRegistrationModal: React.FC<CandidateRegistrationModalProp
                 <input
                   type="email"
                   required
-                  placeholder="student@student.nsuk.edu.ng"
+                  placeholder="candidate@srcova.org"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20 focus:border-[#075B40]"
@@ -306,27 +373,130 @@ export const CandidateRegistrationModal: React.FC<CandidateRegistrationModalProp
               </div>
             </div>
 
-            {/* Passport Photo URL / Preview */}
-            <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 flex items-center gap-4">
-              <img
-                src={formData.passportPhoto}
-                alt="Passport preview"
-                className="w-16 h-16 rounded-xl object-cover border-2 border-[#075B40]"
-              />
-              <div className="flex-1">
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Passport Photograph URL / File Preview
+            {/* Real Passport Photograph Upload */}
+            <div className="p-4 bg-gray-50/80 rounded-2xl border border-gray-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-gray-800">
+                  Passport Photograph (Direct File Upload)
                 </label>
-                <input
-                  type="text"
-                  value={formData.passportPhoto}
-                  onChange={(e) => setFormData({ ...formData, passportPhoto: e.target.value })}
-                  className="w-full text-xs px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20"
-                />
-                <p className="text-[10px] text-gray-500 mt-1">
-                  Format: High-resolution clear white/blue background portrait.
-                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput(!showUrlInput)}
+                  className="text-[11px] text-[#075B40] hover:underline font-semibold"
+                >
+                  {showUrlInput ? 'Hide URL input' : 'Or paste image URL'}
+                </button>
               </div>
+
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/png, image/jpeg, image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    processImageFile(e.target.files[0]);
+                  }
+                }}
+              />
+
+              {formData.passportPhoto ? (
+                <div className="flex items-center gap-4 p-3 bg-white rounded-xl border border-emerald-200 shadow-xs">
+                  <CandidateAvatar
+                    src={formData.passportPhoto}
+                    name={formData.fullName || 'Candidate'}
+                    size="xl"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-emerald-800 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        Photo Ready
+                      </span>
+                      <span className="text-[10px] text-gray-400">Attached to profile</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      High-resolution candidate portrait ready for submission.
+                    </p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="text-xs font-semibold text-[#075B40] hover:text-[#003B2B] flex items-center gap-1"
+                      >
+                        <Camera className="w-3 h-3" />
+                        Change Photo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, passportPhoto: '' })}
+                        className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    if (e.dataTransfer.files?.[0]) {
+                      processImageFile(e.dataTransfer.files[0]);
+                    }
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-200 ${
+                    isDragging
+                      ? 'border-[#075B40] bg-emerald-50/60'
+                      : 'border-gray-300 hover:border-[#075B40] bg-white hover:bg-gray-50/50'
+                  }`}
+                >
+                  <div className="mx-auto w-10 h-10 rounded-full bg-[#075B40]/10 flex items-center justify-center text-[#075B40] mb-2">
+                    {isProcessingPhoto ? (
+                      <span className="animate-spin text-xs">â³</span>
+                    ) : (
+                      <Upload className="w-5 h-5" />
+                    )}
+                  </div>
+                  <p className="text-xs font-bold text-gray-800">
+                    {isProcessingPhoto ? 'Processing photo...' : 'Click to upload passport photo, or drag and drop'}
+                  </p>
+                  <p className="text-[10px] text-gray-500 mt-1">
+                    PNG, JPG, or WebP up to 5MB. Automatically optimized for secure storage.
+                  </p>
+                </div>
+              )}
+
+              {photoError && (
+                <p className="text-[11px] text-rose-600 font-medium flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {photoError}
+                </p>
+              )}
+
+              {showUrlInput && (
+                <div className="pt-2">
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                    Direct Image URL
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="https://..."
+                    value={formData.passportPhoto}
+                    onChange={(e) => setFormData({ ...formData, passportPhoto: e.target.value })}
+                    className="w-full text-xs px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20"
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

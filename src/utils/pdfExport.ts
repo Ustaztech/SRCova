@@ -37,12 +37,12 @@ export function exportToPDF({
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(darkGreen[0], darkGreen[1], darkGreen[2]);
-  doc.text('NASARAWA STATE UNIVERSITY, KEFFI', 105, 20, { align: 'center' });
+  doc.text('SRCOVA RESEARCH PROJECT — HIGHER EDUCATION GOVERNANCE', 105, 20, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);
-  doc.text('Student Affairs Division • Student Representative Council (SRC) Directorate', 105, 26, {
+  doc.text('Institutional Case Study: Nasarawa State University, Keffi (NSUK) • Selection Framework', 105, 26, {
     align: 'center',
   });
 
@@ -114,7 +114,7 @@ export function exportToPDF({
   doc.setFontSize(7.5);
   doc.setTextColor(255, 255, 255);
   doc.text(
-    'SRCova — NSUK Student Representative Selection System | Official Institutional Document',
+    'SRCova Research Platform | Case Study: NSUK | Academic Evaluation & Governance Prototype',
     105,
     293,
     { align: 'center' }

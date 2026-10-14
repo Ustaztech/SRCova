@@ -45,8 +45,8 @@ export const AdminSettingsPage: React.FC = () => {
     DatabaseService.resetToSeedData();
     showToast(
       'info',
-      'Database Reset to Demo Records',
-      'Initial NSUK faculties, staff accounts, candidates and nominations restored.'
+      'Database Reinitialized',
+      'Persistent storage reinitialized with clean research taxonomy and administrator account.'
     );
     setIsResetConfirmOpen(false);
     refreshUser();
@@ -277,11 +277,11 @@ export const AdminSettingsPage: React.FC = () => {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 text-xs space-y-4 shadow-2xl">
             <div className="flex items-center gap-3 text-rose-600">
               <AlertTriangle className="w-6 h-6" />
-              <h3 className="text-base font-bold text-gray-900">Reset Demo Database?</h3>
+              <h3 className="text-base font-bold text-gray-900">Reinitialize Database?</h3>
             </div>
             <p className="text-gray-600 leading-relaxed text-[11px]">
-              This will reinitialize the local database with the default NSUK demonstration records, restoring
-              all demo staff accounts, faculties, sample candidates and workflows across all 5 roles.
+              This will reinitialize the database with clean research configuration, resetting all
+              candidate rosters, nominations, and reviews while preserving institutional settings.
             </p>
             <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
               <button

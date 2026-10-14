@@ -1,3 +1,4 @@
+import { CandidateAvatar } from '../common/CandidateAvatar';
 import React, { useState, useEffect } from 'react';
 import { DatabaseService } from '../../db/storage';
 import { useAuth } from '../../context/AuthContext';
@@ -191,11 +192,7 @@ export const FacultyDashboard: React.FC<FacultyDashboardProps> = ({
                           {nom.referenceNumber}
                         </td>
                         <td className="px-4 py-3 font-semibold text-gray-900 flex items-center gap-2">
-                          <img
-                            src={s?.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                            alt={s?.fullName}
-                            className="w-7 h-7 rounded-lg object-cover border border-[#075B40]"
-                          />
+                          <CandidateAvatar src={s?.passportPhoto} name={s?.fullName} size="sm" />
                           <span>{s?.fullName}</span>
                         </td>
                         <td className="px-4 py-3 font-mono text-gray-600">{s?.matricNumber}</td>

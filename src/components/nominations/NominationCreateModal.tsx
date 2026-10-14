@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { CandidateAvatar } from '../common/CandidateAvatar';
 import { Modal } from '../common/Modal';
 import { DatabaseService } from '../../db/storage';
 import { useAuth } from '../../context/AuthContext';
@@ -40,13 +41,12 @@ export const NominationCreateModal: React.FC<NominationCreateModalProps> = ({
   const [willingnessStatement, setWillingnessStatement] = useState('');
   const [supportingStatement, setSupportingStatement] = useState('');
 
-  // Mock Uploaded Documents
+  // Attached Documents with real file data
   const [uploadedDocs, setUploadedDocs] = useState<
-    Array<{ type: string; name: string; size: string }>
-  >([
-    { type: 'Statement of Result', name: 'Official_Academic_Transcript.pdf', size: '480 KB' },
-    { type: 'Student ID Card', name: 'NSUK_Student_ID_Card.png', size: '210 KB' },
-  ]);
+    Array<{ type: string; name: string; size: string; fileData?: string }>
+  >([]);
+  const docFileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isReadingFile, setIsReadingFile] = useState(false);
 
   const [docTypeInput, setDocTypeInput] = useState('Statement of Result');
   const [docNameInput, setDocNameInput] = useState('');
@@ -90,11 +90,42 @@ export const NominationCreateModal: React.FC<NominationCreateModalProps> = ({
     if (pos) setProposedPosition(pos.title);
   };
 
+  const handleRealFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsReadingFile(true);
+    const sizeStr =
+      file.size > 1024 * 1024
+        ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
+        : Math.max(1, Math.round(file.size / 1024)) + ' KB';
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setUploadedDocs((prev) => [
+        ...prev,
+        {
+          type: docTypeInput,
+          name: file.name,
+          size: sizeStr,
+          fileData: reader.result as string,
+        },
+      ]);
+      setIsReadingFile(false);
+      if (docFileInputRef.current) docFileInputRef.current.value = '';
+    };
+    reader.onerror = () => {
+      showToast('danger', 'File Error', 'Could not read selected document.');
+      setIsReadingFile(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleAddDocument = () => {
     if (!docNameInput.trim()) return;
     setUploadedDocs((prev) => [
       ...prev,
-      { type: docTypeInput, name: docNameInput.trim(), size: '320 KB' },
+      { type: docTypeInput, name: docNameInput.trim(), size: '250 KB' },
     ]);
     setDocNameInput('');
   };
@@ -146,7 +177,7 @@ export const NominationCreateModal: React.FC<NominationCreateModalProps> = ({
           studentId: selectedStudent.id,
           documentType: d.type as any,
           fileName: d.name,
-          fileUrl: `https://nsuk.edu.ng/vault/${d.name}`,
+          fileUrl: d.fileData || `data:application/pdf;base64,${d.name}`,
           fileSize: d.size,
           verificationStatus: 'Pending',
         });
@@ -263,10 +294,10 @@ export const NominationCreateModal: React.FC<NominationCreateModalProps> = ({
 
             {selectedStudent && (
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex items-center gap-4">
-                <img
-                  src={selectedStudent.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-                  alt={selectedStudent.fullName}
-                  className="w-14 h-14 rounded-xl object-cover border-2 border-[#075B40]"
+                <CandidateAvatar
+                  src={selectedStudent.passportPhoto}
+                  name={selectedStudent.fullName}
+                  size="xl"
                 />
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-xs">
                   <div>
@@ -374,35 +405,44 @@ export const NominationCreateModal: React.FC<NominationCreateModalProps> = ({
                 Attached Supporting Documents
               </label>
               <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                {/* Hidden File Picker */}
+                <input
+                  type="file"
+                  ref={docFileInputRef}
+                  accept=".pdf, .png, .jpg, .jpeg, .doc, .docx"
+                  onChange={handleRealFileUpload}
+                  className="hidden"
+                />
+
                 <div className="flex flex-col sm:flex-row gap-2">
                   <select
                     value={docTypeInput}
                     onChange={(e) => setDocTypeInput(e.target.value)}
-                    className="text-xs px-3 py-1.5 border border-gray-300 rounded-lg bg-white"
+                    className="text-xs px-3 py-1.5 border border-gray-300 rounded-lg bg-white font-medium"
                   >
-                    <option value="Statement of Result">Statement of Result</option>
+                    <option value="Statement of Result">Statement of Result (Required)</option>
+                    <option value="Student ID Card">Student ID Card (Required)</option>
                     <option value="Course Rep Certificate">Course Rep Certificate</option>
                     <option value="Character Clearance">Character Clearance</option>
-                    <option value="Student ID Card">Student ID Card</option>
                     <option value="Letter of Intent">Letter of Intent</option>
                   </select>
-                  <input
-                    type="text"
-                    placeholder="Enter document file name e.g. Result_Transcript.pdf"
-                    value={docNameInput}
-                    onChange={(e) => setDocNameInput(e.target.value)}
-                    className="flex-1 text-xs px-3 py-1.5 border border-gray-300 rounded-lg"
-                  />
                   <button
                     type="button"
-                    onClick={handleAddDocument}
-                    className="px-3 py-1.5 text-xs font-semibold bg-[#075B40] text-white rounded-lg hover:bg-[#003B2B]"
+                    onClick={() => docFileInputRef.current?.click()}
+                    disabled={isReadingFile}
+                    className="flex-1 px-3 py-2 text-xs font-bold bg-[#075B40] hover:bg-[#003B2B] text-white rounded-lg flex items-center justify-center gap-2 transition-colors shadow-xs"
                   >
-                    Add Document
+                    <Upload className="w-3.5 h-3.5 text-[#D5AC49]" />
+                    <span>{isReadingFile ? 'Reading File...' : 'Browse & Attach File (PDF, PNG, JPG)'}</span>
                   </button>
                 </div>
 
                 <div className="divide-y divide-gray-200 pt-2">
+                  {uploadedDocs.length === 0 ? (
+                    <div className="py-4 text-center text-xs text-gray-500 bg-white rounded-lg border border-dashed border-gray-200">
+                      No documents attached yet. Click <strong>Browse & Attach File</strong> above to attach required credentials.
+                    </div>
+                  ) : null}
                   {uploadedDocs.map((doc, idx) => (
                     <div key={idx} className="py-2 flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">

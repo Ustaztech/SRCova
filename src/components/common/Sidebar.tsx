@@ -142,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   SRCova
                 </span>
                 <span className="text-[10px] text-[#D5AC49] tracking-wider uppercase font-semibold block">
-                  NSUK Portal
+                  Research Pilot · Case Study: NSUK
                 </span>
               </div>
             </div>

@@ -65,7 +65,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
                 Welcome to <span className="text-[#D5AC49]">SRCova</span>
               </h2>
               <p className="text-xs sm:text-sm font-semibold text-emerald-200 mt-1">
-                Nasarawa State University, Keffi — Student Representative Selection System
+                Academic Research Prototype · Case Study: Nasarawa State University, Keffi (NSUK)
               </p>
               <p className="text-[12px] text-[#D5AC49] font-medium italic mt-0.5">
                 "Smart Selection. Strong Representation."
@@ -79,10 +79,10 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           {/* Introductory Message */}
           <div className="text-xs sm:text-sm text-gray-700 leading-relaxed space-y-2">
             <p>
-              We welcome university officers, faculty deans, heads of departments, and student representatives to the official <strong>SRCova Digital Portal</strong>.
+              Welcome to the <strong>SRCova Higher Education Governance Research Platform</strong>.
             </p>
             <p className="text-gray-600">
-              In accordance with NSUK University Statutes, SRCova digitizes the entire lifecycle of the Student Representative Council selection—transitioning from traditional paper applications to an auditable, merit-driven workflow.
+              This academic research project demonstrates a merit-driven, decentralized, and auditable digital selection framework for the Student Representative Council (SRC), using <strong>Nasarawa State University, Keffi (NSUK)</strong> as an institutional case study.
             </p>
           </div>
 

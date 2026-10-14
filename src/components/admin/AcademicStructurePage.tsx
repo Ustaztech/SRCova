@@ -304,11 +304,11 @@ export const AcademicStructurePage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-semibold text-gray-700 mb-1">Dean of Faculty *</label>
+              <label className="block font-semibold text-gray-700 mb-1">Dean of Faculty (e.g. USMAN SABIU) *</label>
               <input
                 type="text"
                 required
-                placeholder="e.g. Prof. Zainab Umar"
+                placeholder="e.g. USMAN SABIU"
                 value={newFac.deanName}
                 onChange={(e) => setNewFac({ ...newFac, deanName: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20"
@@ -319,7 +319,7 @@ export const AcademicStructurePage: React.FC = () => {
               <input
                 type="email"
                 required
-                placeholder="dean.nas@nsuk.edu.ng"
+                placeholder="dean@srcova.org"
                 value={newFac.officerEmail}
                 onChange={(e) => setNewFac({ ...newFac, officerEmail: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20"
@@ -391,11 +391,11 @@ export const AcademicStructurePage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-semibold text-gray-700 mb-1">Head of Department (HOD) *</label>
+              <label className="block font-semibold text-gray-700 mb-1">Head of Department (e.g. USMAN SABIU) *</label>
               <input
                 type="text"
                 required
-                placeholder="e.g. Dr. Emmanuel Kalu"
+                placeholder="e.g. USMAN SABIU"
                 value={newDept.hodName}
                 onChange={(e) => setNewDept({ ...newDept, hodName: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg"
@@ -406,7 +406,7 @@ export const AcademicStructurePage: React.FC = () => {
               <input
                 type="email"
                 required
-                placeholder="hod.cs@nsuk.edu.ng"
+                placeholder="hod@srcova.org"
                 value={newDept.officerEmail}
                 onChange={(e) => setNewDept({ ...newDept, officerEmail: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg"

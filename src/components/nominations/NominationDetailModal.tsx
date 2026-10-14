@@ -1,3 +1,4 @@
+import { CandidateAvatar } from '../common/CandidateAvatar';
 import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { StatusBadge } from '../common/StatusBadge';
@@ -133,11 +134,7 @@ export const NominationDetailModal: React.FC<NominationDetailModalProps> = ({
         {/* Top Summary Banner */}
         <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <img
-              src={student?.passportPhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}
-              alt={student?.fullName}
-              className="w-14 h-14 rounded-xl object-cover border-2 border-[#075B40] shadow-xs"
-            />
+            <CandidateAvatar src={student?.passportPhoto} name={student?.fullName} size="sm" />
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-gray-900 font-display">{student?.fullName}</h3>

@@ -41,7 +41,7 @@ import {
   INITIAL_AUDIT_LOGS,
 } from './seedData';
 
-const DB_PREFIX = 'srcova_prod_v2_';
+const DB_PREFIX = 'srcova_prod_v3_';
 
 // Purge legacy mock data keys on startup
 try {
@@ -49,7 +49,12 @@ try {
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && (key.startsWith('srcova_db_v1_') || key === 'srcova_auth_user_id')) {
+      if (
+        key &&
+        (key.startsWith('srcova_db_v1_') ||
+          key.startsWith('srcova_prod_v2_') ||
+          key === 'srcova_auth_user_id')
+      ) {
         keysToRemove.push(key);
       }
     }
@@ -509,7 +514,7 @@ export class DatabaseService {
     const dept = depts.find((d) => d.id === data.departmentId);
     const deptCode = dept ? dept.code : 'GEN';
     const randCode = Math.floor(100 + Math.random() * 900);
-    const refNumber = `NSUK/SRC/2026/${deptCode}-${randCode}`;
+    const refNumber = `SRCOVA/2026/${deptCode}-${randCode}`;
 
     const nominations = this.getNominations();
     const newNom: Nomination = {
@@ -1127,6 +1132,8 @@ export class DatabaseService {
     localStorage.removeItem(DB_PREFIX + 'reviews');
     localStorage.removeItem(DB_PREFIX + 'selections');
     localStorage.removeItem(DB_PREFIX + 'notifications');
-    localStorage.removeItem(DB_PREFIX + 'audit_logs');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('srcova:data_changed', { detail: { key: 'reset' } }));
+    }
   }
 }

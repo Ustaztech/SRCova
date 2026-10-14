@@ -33,11 +33,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
   const faqs = [
     {
       q: 'What is SRCova?',
-      a: 'SRCova is the official digital nomination, academic verification, and administrative selection system designed for the Student Representative Council (SRC) at Nasarawa State University, Keffi (NSUK). It transitions traditional paper-based processes into a transparent, merit-driven online workflow.',
+      a: 'SRCova is an academic research project evaluating digital merit selection, academic verification, and governance in higher education, using Nasarawa State University, Keffi (NSUK) as an institutional case study. It transitions traditional paper-based processes into a transparent, merit-driven online workflow.',
     },
     {
       q: 'Does SRCova conduct electronic voting?',
-      a: 'No. In strict compliance with NSUK university statutes, the Student Representative Council selection is conducted through rigorous academic verification, faculty screening, departmental representation quotas, and Student Affairs recommendation—not open popular elections.',
+      a: 'No. In alignment with collegiate selection statutes evaluated in this study, the Student Representative Council selection is conducted through rigorous academic verification, faculty screening, departmental representation quotas, and Student Affairs recommendation—not open popular elections.',
     },
     {
       q: 'Who can register and submit candidate nominations?',
@@ -131,7 +131,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#075B40]/10 border border-[#075B40]/20 text-[#075B40] text-xs font-bold">
                 <Sparkles className="w-4 h-4 text-[#D5AC49]" />
-                <span>Nasarawa State University, Keffi (NSUK)</span>
+                <span>Higher Education Research Project · Case Study: NSUK</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#003B2B] tracking-tight font-display leading-[1.1]">
@@ -139,11 +139,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
               </h1>
 
               <p className="text-xl sm:text-2xl font-bold text-[#D5AC49] font-display">
-                NSUK Student Representative Selection System
+                Digital Student Representative Selection Platform
               </p>
 
               <p className="text-sm sm:text-base text-gray-600 max-w-2xl leading-relaxed">
-                A secure digital platform simplifying student representative nominations, academic verification, and transparent administrative selection for Nasarawa State University, Keffi.
+                An academic research project evaluating digital merit selection and governance in higher education institutions, using Nasarawa State University, Keffi (NSUK) as an empirical case study.
               </p>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
@@ -190,7 +190,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
                       Smart Selection. Strong Representation.
                     </span>
                     <span className="text-[10px] text-gray-400 mt-0.5 block">
-                      Academic Prototype Demonstration for NSUK
+                      Academic Research Prototype · Case Study: NSUK
                     </span>
                   </div>
                 </div>
@@ -213,9 +213,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
               About the SRCova System
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Designed specifically for Nasarawa State University, Keffi, SRCova bridges the gap
+              Evaluating digital governance frameworks in higher education, SRCova bridges the gap
               between departmental leadership and institutional governance, replacing manual
-              paper files with authenticated, auditable selection workflows.
+              paper files with authenticated, auditable selection workflows (Case Study: NSUK).
             </p>
           </div>
 
@@ -270,7 +270,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
               Institutional Impact
             </span>
             <h2 className="text-3xl font-extrabold text-[#003B2B] font-display">
-              Why SRCova for NSUK?
+              Why Digital Selection? (Case Study: NSUK)
             </h2>
             <p className="text-xs sm:text-sm text-gray-600">
               Modernizing student representative selection with transparency, accountability, and speed.
@@ -498,7 +498,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
                 </div>
                 <div className="flex items-center gap-3 text-emerald-100">
                   <Mail className="w-4 h-4 text-[#D5AC49]" />
-                  <span>srcova@nsuk.edu.ng</span>
+                  <span>support.srcover@gmail.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-emerald-100">
                   <Phone className="w-4 h-4 text-[#D5AC49]" />
@@ -512,8 +512,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
                 Institutional System Status
               </h4>
               <p className="text-xs text-emerald-200 leading-relaxed">
-                This deployment represents the official SRCova academic MVP system. Operational across
-                all faculties with secure role isolation and audit logging.
+                This deployment represents the SRCova academic research prototype. Fully operational with real-time persistent data, secure role isolation, and comprehensive audit logging.
               </p>
               <div className="pt-2 flex gap-3">
                 <button
@@ -533,13 +532,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300/80">
           <div className="flex items-center gap-3">
             <BrandLogo variant="horizontal" height={32} />
-            <span>• Nasarawa State University, Keffi</span>
+            <span>• Academic Research Study · Case Study: NSUK</span>
           </div>
 
           <div className="text-center sm:text-right">
-            <p>© 2026 NSUK Student Representative Council (SRC) Directorate. All rights reserved.</p>
+            <p>© 2026 SRCova Research Project. All rights reserved.</p>
             <p className="text-[10px] text-emerald-400/60 mt-0.5">
-              Academic Prototype — Designed strictly in compliance with NSUK Student Handbook Regulations.
+              Academic Research Prototype — Higher Education Governance Framework (Case Study: NSUK).
             </p>
           </div>
         </div>

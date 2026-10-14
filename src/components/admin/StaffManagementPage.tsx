@@ -243,11 +243,11 @@ export const StaffManagementPage: React.FC = () => {
           <form onSubmit={handleCreateStaff} className="space-y-4 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Full Name & Title *</label>
+                <label className="block font-semibold text-gray-700 mb-1">Full Name (e.g. USMAN SABIU) *</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Dr. Haruna Bello"
+                  placeholder="e.g. USMAN SABIU"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20"
@@ -259,7 +259,7 @@ export const StaffManagementPage: React.FC = () => {
                 <input
                   type="email"
                   required
-                  placeholder="officer@nsuk.edu.ng"
+                  placeholder="officer@srcova.org"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#075B40]/20"
