@@ -116,7 +116,35 @@ export class DatabaseService {
 
   // Users
   static getUsers(): User[] {
-    return getStored<User[]>('users', INITIAL_USERS);
+    let users = getStored<User[]>('users', INITIAL_USERS);
+    const adminEmail = 'support.srcover@gmail.com';
+    let changed = false;
+
+    // Ensure support.srcover@gmail.com is present and is SUPER_ADMIN
+    const rootAdmin = users.find((u) => u.email.toLowerCase() === adminEmail);
+    if (!rootAdmin) {
+      users.unshift(INITIAL_USERS[0]);
+      changed = true;
+    } else {
+      if (rootAdmin.role !== 'SUPER_ADMIN' || !rootAdmin.isActive) {
+        rootAdmin.role = 'SUPER_ADMIN';
+        rootAdmin.isActive = true;
+        changed = true;
+      }
+    }
+
+    // Ensure no other account holds the SUPER_ADMIN role
+    users.forEach((u) => {
+      if (u.email.toLowerCase() !== adminEmail && u.role === 'SUPER_ADMIN') {
+        u.role = 'MANAGEMENT_APPROVER';
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      setStored('users', users);
+    }
+    return users;
   }
 
   static getUserById(id: string): User | undefined {
@@ -129,8 +157,16 @@ export class DatabaseService {
 
   static createUser(user: Omit<User, 'id' | 'createdAt'>, currentUser?: User): User {
     const users = this.getUsers();
+    const normalizedEmail = user.email.trim().toLowerCase();
+    let role = user.role;
+    if (role === 'SUPER_ADMIN' && normalizedEmail !== 'support.srcover@gmail.com') {
+      role = 'MANAGEMENT_APPROVER';
+    }
+
     const newUser: User = {
       ...user,
+      email: normalizedEmail,
+      role,
       id: `user-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       createdAt: new Date().toISOString(),
     };
@@ -155,6 +191,22 @@ export class DatabaseService {
     const users = this.getUsers();
     const idx = users.findIndex((u) => u.id === id);
     if (idx === -1) throw new Error('User not found');
+
+    const targetUser = users[idx];
+    const normalizedEmail = targetUser.email.toLowerCase();
+
+    // Guard support.srcover@gmail.com
+    if (normalizedEmail === 'support.srcover@gmail.com') {
+      if (partial.role && partial.role !== 'SUPER_ADMIN') {
+        partial.role = 'SUPER_ADMIN';
+      }
+      if (partial.isActive === false) {
+        partial.isActive = true;
+      }
+    } else if (partial.role === 'SUPER_ADMIN') {
+      partial.role = 'MANAGEMENT_APPROVER';
+    }
+
     users[idx] = { ...users[idx], ...partial };
     setStored('users', users);
 

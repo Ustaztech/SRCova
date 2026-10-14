@@ -155,13 +155,10 @@ export const NominationCreateModal: React.FC<NominationCreateModalProps> = ({
           facultyId: selectedStudent.facultyId,
           departmentId: selectedStudent.departmentId,
           status: initialStatus,
-          proposedPosition: proposedPosition || 'Faculty Representative',
-          leadershipExperience: leadershipExperience || 'Active student representative and leadership record.',
-          willingnessStatement:
-            willingnessStatement ||
-            'Solemnly committed to representing fellow students with integrity and diligence.',
-          supportingStatement:
-            supportingStatement || 'Recommended by Departmental Board for high academic standing.',
+          proposedPosition: proposedPosition.trim(),
+          leadershipExperience: leadershipExperience.trim(),
+          willingnessStatement: willingnessStatement.trim(),
+          supportingStatement: supportingStatement.trim(),
           clearanceStatus: 'Cleared',
           submittedAt: isSubmitting ? new Date().toISOString() : undefined,
           submittedByUserId: currentUser?.id,

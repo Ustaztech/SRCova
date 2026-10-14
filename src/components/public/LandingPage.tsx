@@ -254,7 +254,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
                 Equitable Faculty Quotas
               </h3>
               <p className="text-xs text-gray-600 leading-relaxed">
-                Guarantees balanced representation across all 7 NSUK faculties, eliminating
+                Guarantees balanced representation across collegiate faculties (Case Study: NSUK), eliminating
                 disproportionate dominance and upholding statutory collegiate balance.
               </p>
             </div>
@@ -407,7 +407,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
               <div>
                 <strong className="text-xs text-[#003B2B] block">Academic Standing (200L to 400L/500L):</strong>
                 <p className="text-[11px] text-gray-600">
-                  Must have completed at least one full academic year at NSUK. Fresh 100L students are not eligible.
+                  Must have completed at least one full academic year at the institution (Case Study: NSUK). Fresh 100L students are not eligible.
                 </p>
               </div>
             </div>

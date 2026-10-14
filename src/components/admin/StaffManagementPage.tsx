@@ -68,6 +68,10 @@ export const StaffManagementPage: React.FC = () => {
   };
 
   const handleToggleStatus = (u: User) => {
+    if (u.email.toLowerCase() === 'support.srcover@gmail.com') {
+      showToast('warning', 'Action Prohibited', 'The primary administrator account (support.srcover@gmail.com) cannot be deactivated.');
+      return;
+    }
     if (u.id === currentUser?.id) {
       showToast('warning', 'Action Prohibited', 'You cannot deactivate your own active session.');
       return;
@@ -209,19 +213,25 @@ export const StaffManagementPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => handleToggleStatus(u)}
-                        className={`p-1 rounded transition-colors ${
-                          u.isActive ? 'text-emerald-700 hover:text-emerald-900' : 'text-gray-400 hover:text-gray-600'
-                        }`}
-                        title={u.isActive ? 'Deactivate' : 'Activate'}
-                      >
-                        {u.isActive ? (
-                          <ToggleRight className="w-6 h-6 inline" />
-                        ) : (
-                          <ToggleLeft className="w-6 h-6 inline" />
-                        )}
-                      </button>
+                      {u.email.toLowerCase() === 'support.srcover@gmail.com' ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#075B40] bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          Primary Admin
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleToggleStatus(u)}
+                          className={`p-1 rounded transition-colors ${
+                            u.isActive ? 'text-emerald-700 hover:text-emerald-900' : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                          title={u.isActive ? 'Deactivate' : 'Activate'}
+                        >
+                          {u.isActive ? (
+                            <ToggleRight className="w-6 h-6 inline" />
+                          ) : (
+                            <ToggleLeft className="w-6 h-6 inline" />
+                          )}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
@@ -279,8 +289,10 @@ export const StaffManagementPage: React.FC = () => {
                   <option value="FACULTY_OFFICER">Faculty Officer / Dean</option>
                   <option value="DEAN_STUDENT_AFFAIRS">Dean of Student Affairs</option>
                   <option value="MANAGEMENT_APPROVER">Management Approving Officer</option>
-                  <option value="SUPER_ADMIN">System Administrator</option>
                 </select>
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Super Administrator authority is exclusively reserved for <strong>support.srcover@gmail.com</strong>.
+                </p>
               </div>
 
               <div>

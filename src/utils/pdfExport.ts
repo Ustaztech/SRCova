@@ -37,12 +37,12 @@ export function exportToPDF({
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(darkGreen[0], darkGreen[1], darkGreen[2]);
-  doc.text('SRCOVA RESEARCH PROJECT — HIGHER EDUCATION GOVERNANCE', 105, 20, { align: 'center' });
+  doc.text('SRCOVA RESEARCH PROJECT - HIGHER EDUCATION GOVERNANCE', 105, 20, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);
-  doc.text('Institutional Case Study: Nasarawa State University, Keffi (NSUK) • Selection Framework', 105, 26, {
+  doc.text('Institutional Case Study: Nasarawa State University, Keffi (NSUK) | Selection Framework', 105, 26, {
     align: 'center',
   });
 

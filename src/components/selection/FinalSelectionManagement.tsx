@@ -74,7 +74,7 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
     setSelectedNomination(nom);
     const randNum = Math.floor(10 + Math.random() * 90);
     setResolutionNumber(`SRCOVA/RES/2026/0${randNum}`);
-    setExecutiveNotes('Ratified by Vice-Chancellor selection panel.');
+    setExecutiveNotes('');
   };
 
   const handleConfirmSelection = (e: React.FormEvent) => {
@@ -123,7 +123,7 @@ export const FinalSelectionManagement: React.FC<FinalSelectionManagementProps> =
         DatabaseService.confirmSelection(
           nom.id,
           resNo,
-          'Ratified during plenary selection board session.',
+          'Confirmed and ratified by Selection Board.',
           currentUser
         );
       });
