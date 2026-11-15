@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrandLogo } from '../common/BrandLogo';
-import { WelcomeModal } from './WelcomeModal';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -28,7 +27,6 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPortal }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState<boolean>(true);
 
   const faqs = [
     {
@@ -65,13 +63,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
               2025/2026 Student Representative Council (SRC) Digital Merit Selection Exercise is officially live.
             </span>
           </div>
-          <button
-            onClick={() => setIsWelcomeModalOpen(true)}
-            className="text-[11px] font-bold text-[#D5AC49] hover:underline flex items-center gap-1.5 shrink-0"
-          >
-            <span>Read Welcome Message</span>
-            <Sparkles className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
 
@@ -277,7 +268,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div id="features" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-xs">
               <div className="text-2xl font-black text-[#075B40] font-display mb-1">01</div>
               <h4 className="font-bold text-sm text-gray-900 mb-1">Eliminates Paper Friction</h4>
@@ -544,18 +535,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPo
         </div>
       </footer>
 
-      {/* Welcome Pop-up Modal */}
-      <WelcomeModal
-        isOpen={isWelcomeModalOpen}
-        onClose={() => setIsWelcomeModalOpen(false)}
-        onGoToLogin={onGoToLogin}
-        onExploreWorkflow={() => {
-          const el = document.getElementById('workflow');
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      />
     </div>
   );
 };

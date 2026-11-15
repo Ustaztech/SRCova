@@ -52,8 +52,7 @@ try {
       if (
         key &&
         (key.startsWith('srcova_db_v1_') ||
-          key.startsWith('srcova_prod_v2_') ||
-          key === 'srcova_auth_user_id')
+          key.startsWith('srcova_prod_v2_'))
       ) {
         keysToRemove.push(key);
       }

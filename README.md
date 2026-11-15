@@ -30,3 +30,14 @@ If you are developing a production application, we recommend enabling type-aware
 ```
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+
+## SRCova and Supabase
+
+The initial database schema and row-level security policies are in `supabase/migrations/20261115000000_srcova_initial_schema.sql`.
+
+1. Create a Supabase project.
+2. Run the migration in the Supabase SQL Editor (or apply it with the Supabase CLI).
+3. Copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from the project API settings.
+4. Provision staff through a trusted administrative process and create matching `profiles` rows. Do not enable public sign-up or put a service-role key in the browser app.
+
+The current UI still uses its browser-local demo storage and authentication. Connecting the workflows to Supabase, provisioning users, and configuring private document storage require a live project and are not completed by the schema migration alone.
