@@ -4,21 +4,40 @@
 
 @layer base {
   :root {
-    --primary: 7 91 64;
-    --dark: 0 59 43;
-    --emerald: 19 138 99;
-    --gold: 213 172 73;
+    --primary: 6 78 59;
+    --dark: 2 44 34;
+    --emerald: 16 120 86;
+    --gold: 190 151 66;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #F7F9F8;
-    color: #202B28;
+    min-width: 320px;
+    background-color: #f8faf9;
+    color: #1e293b;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
     letter-spacing: -0.02em;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid #047857;
+    outline-offset: 3px;
   }
 }
 

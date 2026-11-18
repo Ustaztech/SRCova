@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { DatabaseService } from '../../db/storage';
 import { StatCard } from '../common/StatCard';
 import { StatusBadge } from '../common/StatusBadge';
-import { Nomination, Student, Faculty, User } from '../../types';
+import { Nomination } from '../../types';
 import {
   Users,
   FileText,
@@ -13,10 +13,8 @@ import {
   Award,
   Sparkles,
   GraduationCap,
-  Building2,
   TrendingUp,
   ArrowUpRight,
-  ShieldCheck,
 } from 'lucide-react';
 import {
   BarChart,
@@ -29,7 +27,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from 'recharts';
 
 interface SuperAdminDashboardProps {
@@ -41,21 +38,16 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   onNavigate,
   onOpenNomination,
 }) => {
-  const [candidates, setCandidates] = useState<Student[]>([]);
-  const [nominations, setNominations] = useState<Nomination[]>([]);
-  const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [staffUsers, setStaffUsers] = useState<User[]>([]);
-
-  const loadData = () => {
-    setCandidates(DatabaseService.getStudents());
-    setNominations(DatabaseService.getNominations());
-    setFaculties(DatabaseService.getFaculties());
-    setStaffUsers(DatabaseService.getUsers());
-  };
+  const loadData = () => ({
+    candidates: DatabaseService.getStudents(),
+    nominations: DatabaseService.getNominations(),
+    faculties: DatabaseService.getFaculties(),
+    staffUsers: DatabaseService.getUsers(),
+  });
+  const [{ candidates, nominations, faculties, staffUsers }, setDashboardData] = useState(loadData);
 
   useEffect(() => {
-    loadData();
-    const handleUpdate = () => loadData();
+    const handleUpdate = () => setDashboardData(loadData());
     window.addEventListener('srcova:data_changed', handleUpdate);
     return () => window.removeEventListener('srcova:data_changed', handleUpdate);
   }, []);
@@ -78,15 +70,22 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   const selectedMembers = nominations.filter((n) => n.status === 'Selected').length;
   const activeStaff = staffUsers.filter((u) => u.isActive).length;
 
-  // Chart data: Distribution by faculty
+  // Aggregate in one pass so chart preparation scales with records, not faculties × records.
+  const facultyTotals = nominations.reduce((totals, nomination) => {
+    const total = totals.get(nomination.facultyId) || { nominations: 0, selected: 0 };
+    total.nominations += 1;
+    if (nomination.status === 'Selected') total.selected += 1;
+    totals.set(nomination.facultyId, total);
+    return totals;
+  }, new Map<string, { nominations: number; selected: number }>());
+
   const facultyChartData = faculties.map((f) => {
-    const count = nominations.filter((n) => n.facultyId === f.id).length;
-    const selected = nominations.filter((n) => n.facultyId === f.id && n.status === 'Selected').length;
+    const total = facultyTotals.get(f.id) || { nominations: 0, selected: 0 };
     return {
       name: f.code,
       fullName: f.name,
-      Nominations: count,
-      Selected: selected,
+      Nominations: total.nominations,
+      Selected: total.selected,
     };
   });
 

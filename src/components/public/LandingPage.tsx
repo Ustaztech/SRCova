@@ -1,540 +1,369 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrandLogo } from '../common/BrandLogo';
 import {
-  ShieldCheck,
-  CheckCircle2,
-  Users,
-  GraduationCap,
-  Award,
-  Lock,
   ArrowRight,
-  FileText,
-  ChevronDown,
-  Building2,
-  Phone,
-  Mail,
-  MapPin,
-  Sparkles,
-  ExternalLink,
-  ChevronRight,
-  HelpCircle,
+  CheckCircle2,
+  ClipboardCheck,
+  FileCheck2,
+  GraduationCap,
+  LockKeyhole,
+  ShieldCheck,
+  UsersRound,
 } from 'lucide-react';
 
+export type PublicPage = 'public-landing' | 'public-about' | 'public-process' | 'public-eligibility';
+
 interface LandingPageProps {
+  page: PublicPage;
+  onNavigatePage: (page: PublicPage) => void;
   onGoToLogin: () => void;
   onEnterPortal: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onEnterPortal }) => {
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+const navigation: { id: PublicPage; label: string }[] = [
+  { id: 'public-landing', label: 'Home' },
+  { id: 'public-about', label: 'About' },
+  { id: 'public-process', label: 'Selection process' },
+  { id: 'public-eligibility', label: 'Eligibility' },
+];
 
-  const faqs = [
-    {
-      q: 'What is SRCova?',
-      a: 'SRCova is an academic research project evaluating digital merit selection, academic verification, and governance in higher education, using Nasarawa State University, Keffi (NSUK) as an institutional case study. It transitions traditional paper-based processes into a transparent, merit-driven online workflow.',
-    },
-    {
-      q: 'Does SRCova conduct electronic voting?',
-      a: 'No. In alignment with collegiate selection statutes evaluated in this study, the Student Representative Council selection is conducted through rigorous academic verification, faculty screening, departmental representation quotas, and Student Affairs recommendation—not open popular elections.',
-    },
-    {
-      q: 'Who can register and submit candidate nominations?',
-      a: 'Only authorized Departmental Officers and Heads of Departments (HODs) can register prospective student candidates and submit official nominations to the Faculty Screening Board.',
-    },
-    {
-      q: 'What are the minimum eligibility criteria?',
-      a: 'A candidate must possess a verified CGPA of at least 3.50, hold 200L to 400L standing (no fresh 100L students), have demonstrated course representative or class leadership experience, and maintain a clean university disciplinary record.',
-    },
-    {
-      q: 'How does the faculty verify candidate transcripts?',
-      a: 'The Faculty Officer directly audits submitted statements of results against official examination broadsheets before signing off on academic eligibility in the portal.',
-    },
-  ];
+const processSteps = [
+  {
+    number: '01',
+    title: 'Department nomination',
+    description: 'Department officers register a student and submit the required records.',
+  },
+  {
+    number: '02',
+    title: 'Faculty verification',
+    description: 'Faculty staff review academic details against official university records.',
+  },
+  {
+    number: '03',
+    title: 'Student Affairs review',
+    description: 'Student Affairs reviews the verified nomination and records its recommendation.',
+  },
+  {
+    number: '04',
+    title: 'Final approval',
+    description: 'University management reviews and confirms the final selection.',
+  },
+  {
+    number: '05',
+    title: 'Results published',
+    description: 'The confirmed list is prepared for publication and official reporting.',
+  },
+];
+
+const eligibilityCriteria = [
+  {
+    title: 'Academic standing',
+    description: 'Meet the current CGPA and study-level requirements set by the university.',
+  },
+  {
+    title: 'Student leadership',
+    description: 'Show relevant experience representing or supporting fellow students.',
+  },
+  {
+    title: 'University clearance',
+    description: 'Meet applicable disciplinary and administrative clearance requirements.',
+  },
+  {
+    title: 'Verified records',
+    description: 'Provide complete academic information for review by authorized university staff.',
+  },
+];
+
+const pageMeta: Record<PublicPage, { eyebrow: string; title: string; description: string }> = {
+  'public-landing': {
+    eyebrow: 'Nasarawa State University, Keffi',
+    title: 'Student representation, selected with care.',
+    description:
+      'A clear, accountable process for reviewing student representatives—from department nomination through university approval.',
+  },
+  'public-about': {
+    eyebrow: 'About the service',
+    title: 'A better way to manage student representation.',
+    description:
+      'SRCova brings nomination records and review steps together in one place, helping authorized university teams work with clarity and consistency.',
+  },
+  'public-process': {
+    eyebrow: 'Selection process',
+    title: 'Every nomination follows a clear path.',
+    description:
+      'University staff can see who is responsible at each stage, what has been reviewed, and what still needs attention.',
+  },
+  'public-eligibility': {
+    eyebrow: 'Candidate eligibility',
+    title: 'Know what is required before applying.',
+    description:
+      'Candidates are considered against the university’s current requirements. Final decisions are made through the established review process.',
+  },
+};
+
+export const LandingPage: React.FC<LandingPageProps> = ({
+  page,
+  onNavigatePage,
+  onGoToLogin,
+  onEnterPortal,
+}) => {
+  const meta = pageMeta[page];
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] text-[#202B28] font-sans">
-      {/* Top University Announcement Bar */}
-      <div className="bg-[#002D20] text-white py-2.5 px-4 text-xs border-b border-[#075B40]/40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 truncate">
-            <span className="inline-block w-2 h-2 rounded-full bg-[#D5AC49] animate-pulse shrink-0" />
-            <span className="font-bold text-[#D5AC49]">University Notice:</span>
-            <span className="hidden sm:inline text-emerald-100 truncate">
-              2025/2026 Student Representative Council (SRC) Digital Merit Selection Exercise is officially live.
-            </span>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-white text-slate-800">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            className="shrink-0 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-800"
+            onClick={() => onNavigatePage('public-landing')}
+            aria-label="SRCova home"
+          >
+            <BrandLogo variant="horizontal" height={42} />
+          </button>
 
-      {/* Navigation Bar */}
-      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BrandLogo variant="horizontal" height={44} />
-          </div>
-
-          <div className="hidden md:flex items-center gap-8 text-xs font-semibold text-gray-700">
-            <a href="#about" className="hover:text-[#075B40] transition-colors">
-              About SRCova
-            </a>
-            <a href="#why" className="hover:text-[#075B40] transition-colors">
-              Why SRCova?
-            </a>
-            <a href="#features" className="hover:text-[#075B40] transition-colors">
-              Features
-            </a>
-            <a href="#workflow" className="hover:text-[#075B40] transition-colors">
-              How It Works
-            </a>
-            <a href="#eligibility" className="hover:text-[#075B40] transition-colors">
-              Eligibility
-            </a>
-            <a href="#faq" className="hover:text-[#075B40] transition-colors">
-              FAQ
-            </a>
-            <a href="#contact" className="hover:text-[#075B40] transition-colors">
-              Contact
-            </a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onEnterPortal}
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#003B2B] bg-[#D5AC49] hover:bg-[#B88F28] rounded-xl transition-colors shadow-sm"
-            >
-              <span>Explore Portal</span>
-            </button>
-            <button
-              onClick={onGoToLogin}
-              className="px-4 py-2 text-xs font-bold text-white bg-[#075B40] hover:bg-[#003B2B] rounded-xl transition-colors shadow-sm flex items-center gap-1.5"
-            >
-              <Lock className="w-3.5 h-3.5 text-[#D5AC49]" />
-              <span>Staff Login</span>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-gradient-to-b from-white via-[#F7F9F8] to-[#EEF3F0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#075B40]/10 border border-[#075B40]/20 text-[#075B40] text-xs font-bold">
-                <Sparkles className="w-4 h-4 text-[#D5AC49]" />
-                <span>Higher Education Research Project · Case Study: NSUK</span>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#003B2B] tracking-tight font-display leading-[1.1]">
-                Welcome to <span className="text-[#075B40]">SRCova</span>
-              </h1>
-
-              <p className="text-xl sm:text-2xl font-bold text-[#D5AC49] font-display">
-                Digital Student Representative Selection Platform
-              </p>
-
-              <p className="text-sm sm:text-base text-gray-600 max-w-2xl leading-relaxed">
-                An academic research project evaluating digital merit selection and governance in higher education institutions, using Nasarawa State University, Keffi (NSUK) as an empirical case study.
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
-                <button
-                  onClick={onEnterPortal}
-                  className="px-6 py-3.5 text-xs sm:text-sm font-bold text-[#003B2B] bg-[#D5AC49] hover:bg-[#B88F28] rounded-xl flex items-center gap-2 transition-all shadow-md shadow-[#D5AC49]/25 hover:scale-[1.02]"
-                >
-                  <span>Explore SRCova</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={onGoToLogin}
-                  className="px-6 py-3.5 text-xs sm:text-sm font-bold text-white bg-[#075B40] hover:bg-[#003B2B] rounded-xl flex items-center gap-2 transition-all shadow-md shadow-[#075B40]/20 hover:scale-[1.02]"
-                >
-                  <Lock className="w-4 h-4 text-[#D5AC49]" />
-                  <span>Staff Login</span>
-                </button>
-              </div>
-
-              {/* Tagline & Stat Preview */}
-              <div className="pt-6 border-t border-gray-200/80 flex flex-wrap items-center justify-center lg:justify-start gap-8 text-xs text-gray-500">
-                <div>
-                  <span className="font-extrabold text-lg text-[#075B40] block">7 Faculties</span>
-                  <span>Unified Representation</span>
-                </div>
-                <div>
-                  <span className="font-extrabold text-lg text-[#075B40] block">100% Verified</span>
-                  <span>Senate CGPA Audit</span>
-                </div>
-                <div>
-                  <span className="font-extrabold text-lg text-[#075B40] block">Zero Voting</span>
-                  <span>Merit-Based Selection</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Official Premium Logo Visual */}
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="relative">
-                <div className="w-72 sm:w-96 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xl relative z-10 transition-transform duration-300 hover:scale-[1.02]">
-                  <BrandLogo variant="premium" className="w-full justify-center" />
-                  <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#075B40] block">
-                      Smart Selection. Strong Representation.
-                    </span>
-                    <span className="text-[10px] text-gray-400 mt-0.5 block">
-                      Academic Research Prototype · Case Study: NSUK
-                    </span>
-                  </div>
-                </div>
-                {/* Decorative background glow */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-[#075B40]/20 to-[#D5AC49]/20 rounded-3xl blur-2xl z-0" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 1: About SRCova */}
-      <section id="about" className="py-16 bg-white border-y border-gray-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
-            <span className="text-xs font-bold text-[#075B40] uppercase tracking-wider">
-              Institutional Overview
-            </span>
-            <h2 className="text-3xl font-extrabold text-[#003B2B] font-display">
-              About the SRCova System
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Evaluating digital governance frameworks in higher education, SRCova bridges the gap
-              between departmental leadership and institutional governance, replacing manual
-              paper files with authenticated, auditable selection workflows (Case Study: NSUK).
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-[#F7F9F8] border border-gray-200 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#075B40]/10 flex items-center justify-center text-[#075B40]">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-bold text-gray-900 font-display">
-                Academic Ledger Integrity
-              </h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Prevents falsification of academic records by requiring authorized Faculty Officers
-                to verify CGPA standing against departmental broadsheets before forwarding.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-[#F7F9F8] border border-gray-200 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#D5AC49]/20 flex items-center justify-center text-[#003B2B]">
-                <Sparkles className="w-6 h-6 text-[#D5AC49]" />
-              </div>
-              <h3 className="text-base font-bold text-gray-900 font-display">
-                Automated Senate Rules Engine
-              </h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Evaluates candidate dossiers against Senate-configured rules: 3.50 CGPA baseline,
-                course rep credentials, and administrative clearance records.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-[#F7F9F8] border border-gray-200 space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-700">
-                <Award className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-bold text-gray-900 font-display">
-                Equitable Faculty Quotas
-              </h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Guarantees balanced representation across collegiate faculties (Case Study: NSUK), eliminating
-                disproportionate dominance and upholding statutory collegiate balance.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 2: Why SRCova? */}
-      <section id="why" className="py-16 bg-[#EEF3F0]/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
-            <span className="text-xs font-bold text-[#075B40] uppercase tracking-wider">
-              Institutional Impact
-            </span>
-            <h2 className="text-3xl font-extrabold text-[#003B2B] font-display">
-              Why Digital Selection? (Case Study: NSUK)
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600">
-              Modernizing student representative selection with transparency, accountability, and speed.
-            </p>
-          </div>
-
-          <div id="features" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-xs">
-              <div className="text-2xl font-black text-[#075B40] font-display mb-1">01</div>
-              <h4 className="font-bold text-sm text-gray-900 mb-1">Eliminates Paper Friction</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Eliminates lost transcripts, misplaced physical clearance forms, and manual endorsement queues.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-xs">
-              <div className="text-2xl font-black text-[#075B40] font-display mb-1">02</div>
-              <h4 className="font-bold text-sm text-gray-900 mb-1">Prevents Electoral Discord</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Avoids political volatility, vote rigging controversies, and student unrest by enforcing academic meritocracy.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-xs">
-              <div className="text-2xl font-black text-[#075B40] font-display mb-1">03</div>
-              <h4 className="font-bold text-sm text-gray-900 mb-1">Instant Audit Tracking</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Every verification remark, recommendation, and resolution is permanently timestamped in the audit log.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl bg-white border border-gray-200 shadow-xs">
-              <div className="text-2xl font-black text-[#075B40] font-display mb-1">04</div>
-              <h4 className="font-bold text-sm text-gray-900 mb-1">Verifiable Credentials</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Issues authenticated PDF submission receipts and gazetted council appointment lists.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 4: How It Works */}
-      <section id="workflow" className="py-16 bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
-            <span className="text-xs font-bold text-[#075B40] uppercase tracking-wider">
-              Complete End-to-End Pipeline
-            </span>
-            <h2 className="text-3xl font-extrabold text-[#003B2B] font-display">
-              How the Selection Process Works
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600">
-              A 6-stage structured administrative journey from departmental nomination to final Council confirmation.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 text-center">
-            {[
-              {
-                step: '1',
-                title: 'Dept Nomination',
-                desc: 'HOD registers candidate, attaches statement of result, and submits.',
-              },
-              {
-                step: '2',
-                title: 'Faculty Audit',
-                desc: 'Faculty Officer verifies CGPA and level against examination ledger.',
-              },
-              {
-                step: '3',
-                title: 'Eligibility Engine',
-                desc: 'Automated evaluation checks 3.50 CGPA, course rep, and clearance.',
-              },
-              {
-                step: '4',
-                title: 'DSA Review',
-                desc: 'Dean of Student Affairs evaluates dossier and recommends seat.',
-              },
-              {
-                step: '5',
-                title: 'Management Ratification',
-                desc: 'Vice-Chancellor Selection Board confirms council resolution.',
-              },
-              {
-                step: '6',
-                title: 'Official Gazette',
-                desc: 'SRC Council list published with official PDF export and seals.',
-              },
-            ].map((st, i) => (
-              <div
-                key={i}
-                className="p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-[#075B40] transition-colors relative"
+          <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
+            {navigation.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onNavigatePage(item.id)}
+                aria-current={page === item.id ? 'page' : undefined}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  page === item.id
+                    ? 'bg-emerald-50 text-emerald-900'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+                }`}
               >
-                <div className="w-8 h-8 rounded-full bg-[#075B40] text-white font-extrabold text-xs flex items-center justify-center mx-auto mb-2 shadow-xs">
-                  {st.step}
-                </div>
-                <h4 className="text-xs font-bold text-gray-900 mb-1">{st.title}</h4>
-                <p className="text-[11px] text-gray-500 leading-normal">{st.desc}</p>
-              </div>
+                {item.label}
+              </button>
             ))}
+          </nav>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={onGoToLogin}
+              className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 sm:inline-flex"
+            >
+              Staff sign in
+            </button>
+            <button
+              type="button"
+              onClick={onEnterPortal}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+            >
+              Open staff portal
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </button>
           </div>
         </div>
-      </section>
+        <nav aria-label="Mobile navigation" className="flex gap-1 overflow-x-auto border-t border-slate-100 px-4 py-2 md:hidden">
+          {navigation.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onNavigatePage(item.id)}
+              aria-current={page === item.id ? 'page' : undefined}
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium ${
+                page === item.id ? 'bg-emerald-50 text-emerald-900' : 'text-slate-600'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+      </header>
 
-      {/* Section 6: Eligibility Criteria */}
-      <section id="eligibility" className="py-16 bg-[#F7F9F8]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
-            <span className="text-xs font-bold text-[#075B40] uppercase tracking-wider">
-              Senate Standards
-            </span>
-            <h2 className="text-3xl font-extrabold text-[#003B2B] font-display">
-              Minimum Institutional Eligibility Criteria
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600">
-              Only candidates who satisfy all baseline criteria are cleared by the selection engine.
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-              <CheckCircle2 className="w-5 h-5 text-[#075B40] shrink-0 mt-0.5" />
-              <div>
-                <strong className="text-xs text-[#003B2B] block">Minimum Cumulative GPA (CGPA) of 3.50:</strong>
-                <p className="text-[11px] text-gray-600">
-                  Candidate must be in at least Second Class Upper (2:1) standing verified from official faculty ledgers.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-              <CheckCircle2 className="w-5 h-5 text-[#075B40] shrink-0 mt-0.5" />
-              <div>
-                <strong className="text-xs text-[#003B2B] block">Academic Standing (200L to 400L/500L):</strong>
-                <p className="text-[11px] text-gray-600">
-                  Must have completed at least one full academic year at the institution (Case Study: NSUK). Fresh 100L students are not eligible.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-              <CheckCircle2 className="w-5 h-5 text-[#075B40] shrink-0 mt-0.5" />
-              <div>
-                <strong className="text-xs text-[#003B2B] block">Course Representation Track Record:</strong>
-                <p className="text-[11px] text-gray-600">
-                  Active or prior leadership as Course Representative, Assistant Course Rep, or Student Academic Leader.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-              <CheckCircle2 className="w-5 h-5 text-[#075B40] shrink-0 mt-0.5" />
-              <div>
-                <strong className="text-xs text-[#003B2B] block">Disciplinary & Administrative Clearance:</strong>
-                <p className="text-[11px] text-gray-600">
-                  No pending disciplinary sanctions, examination malpractice flags, or university security queries.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 7: FAQ */}
-      <section id="faq" className="py-16 bg-white border-t border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="text-center space-y-3 mb-8">
-            <span className="text-xs font-bold text-[#075B40] uppercase tracking-wider">
-              Answers & Guidance
-            </span>
-            <h2 className="text-3xl font-extrabold text-[#003B2B] font-display">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => (
-              <div
-                key={idx}
-                className="rounded-xl border border-gray-200 overflow-hidden transition-colors"
-              >
+      <main>
+        <section className="relative overflow-hidden border-b border-emerald-950/10 bg-[#f4f7f5]">
+          <div className="absolute -right-28 -top-32 h-[440px] w-[440px] rounded-full border-[70px] border-emerald-900/[0.035]" />
+          <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-24">
+            <div className="max-w-3xl">
+              <p className="mb-5 text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">
+                {meta.eyebrow}
+              </p>
+              <h1 className="max-w-2xl font-display text-4xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-5xl lg:text-[3.5rem]">
+                {meta.title}
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+                {meta.description}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
                 <button
-                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full text-left p-4 bg-gray-50/70 hover:bg-gray-100/70 flex items-center justify-between text-xs font-bold text-gray-900"
+                  type="button"
+                  onClick={onEnterPortal}
+                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-950"
                 >
-                  <span>{faq.q}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-gray-500 transition-transform ${
-                      openFaq === idx ? 'rotate-180' : ''
-                    }`}
-                  />
+                  Go to staff portal
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </button>
-                {openFaq === idx && (
-                  <div className="p-4 bg-white text-xs text-gray-600 leading-relaxed border-t border-gray-100">
-                    {faq.a}
-                  </div>
+                {page !== 'public-process' && (
+                  <button
+                    type="button"
+                    onClick={() => onNavigatePage('public-process')}
+                    className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
+                  >
+                    See how it works
+                  </button>
                 )}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 8: Contact */}
-      <section id="contact" className="py-16 bg-[#003B2B] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-4">
-              <span className="text-xs font-bold text-[#D5AC49] uppercase tracking-wider">
-                Institutional Directorate
-              </span>
-              <h2 className="text-3xl font-extrabold font-display">
-                Contact SRCova Administrative Office
-              </h2>
-              <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
-                For administrative enquiries, user provisioning, or eligibility verification clarifications,
-                please contact the Student Affairs Division.
-              </p>
-
-              <div className="space-y-3 pt-2 text-xs">
-                <div className="flex items-center gap-3 text-emerald-100">
-                  <MapPin className="w-4 h-4 text-[#D5AC49]" />
-                  <span>Student Affairs Division, Senate Building, Main Campus, Keffi, Nasarawa State</span>
-                </div>
-                <div className="flex items-center gap-3 text-emerald-100">
-                  <Mail className="w-4 h-4 text-[#D5AC49]" />
-                  <span>support.srcover@gmail.com</span>
-                </div>
-                <div className="flex items-center gap-3 text-emerald-100">
-                  <Phone className="w-4 h-4 text-[#D5AC49]" />
-                  <span>+234 803 123 4567</span>
-                </div>
+              <div className="mt-9 flex items-center gap-3 border-t border-slate-200 pt-5 text-sm text-slate-600">
+                <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-800" aria-hidden="true" />
+                <span>For authorized university staff. Candidate accounts are not required.</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-4">
-              <h4 className="text-sm font-bold text-white font-display">
-                Institutional System Status
-              </h4>
-              <p className="text-xs text-emerald-200 leading-relaxed">
-                This deployment represents the SRCova academic research prototype. Fully operational with real-time persistent data, secure role isolation, and comprehensive audit logging.
-              </p>
-              <div className="pt-2 flex gap-3">
-                <button
-                  onClick={onGoToLogin}
-                  className="w-full py-2.5 text-xs font-bold bg-[#D5AC49] text-[#003B2B] rounded-xl hover:bg-[#B88F28] transition-colors"
-                >
-                  Authorized Staff Sign In
+            <div className="relative">
+              <div className="absolute inset-5 rounded-3xl bg-emerald-900/10 blur-2xl" />
+              <div className="relative rounded-2xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-900/[0.07] sm:p-9">
+                <BrandLogo variant="premium" className="mx-auto flex justify-center" />
+                <div className="mt-7 border-t border-slate-100 pt-6">
+                  <p className="text-sm font-semibold text-slate-900">A transparent review process</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Nomination, verification, review and approval—organized in one secure staff portal.
+                  </p>
+                  <div className="mt-5 grid grid-cols-2 gap-3">
+                    {[
+                      ['Clear steps', ClipboardCheck],
+                      ['Verified records', FileCheck2],
+                    ].map(([label, Icon]) => {
+                      const FeatureIcon = Icon as typeof ClipboardCheck;
+                      return (
+                        <div key={label as string} className="flex items-center gap-2 rounded-lg bg-slate-50 p-3 text-xs font-medium text-slate-700">
+                          <FeatureIcon className="h-4 w-4 shrink-0 text-emerald-800" aria-hidden="true" />
+                          {label as string}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {page === 'public-landing' && (
+          <>
+            <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+              <div className="max-w-2xl">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">One shared workspace</p>
+                <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+                  The right people, reviewing the right information.
+                </h2>
+                <p className="mt-4 leading-7 text-slate-600">
+                  SRCova helps university teams coordinate student nominations, confirm records, and keep a clear history of decisions.
+                </p>
+              </div>
+              <div className="mt-9 grid gap-4 md:grid-cols-3">
+                {[
+                  { icon: UsersRound, title: 'One connected process', copy: 'Each authorized team handles its part without losing track of the nomination.' },
+                  { icon: FileCheck2, title: 'Records in context', copy: 'Review supporting information alongside each decision and status update.' },
+                  { icon: GraduationCap, title: 'University-led decisions', copy: 'Final outcomes remain with the designated university reviewers.' },
+                ].map(({ icon: Icon, title, copy }) => (
+                  <article key={title} className="rounded-xl border border-slate-200 bg-white p-6 transition-shadow hover:shadow-lg hover:shadow-slate-900/[0.04]">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-50 text-emerald-900">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-5 text-base font-semibold text-slate-950">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <section className="border-y border-slate-200 bg-slate-50">
+              <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 py-12 sm:px-6 md:flex-row md:items-center lg:px-8">
+                <div>
+                  <h2 className="font-display text-2xl font-semibold text-slate-950">Questions about the process?</h2>
+                  <p className="mt-2 text-sm text-slate-600">Read the process and eligibility guidance before contacting your department.</p>
+                </div>
+                <button type="button" onClick={() => onNavigatePage('public-eligibility')} className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-900 hover:text-emerald-700">
+                  View eligibility guidance <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
+            </section>
+          </>
+        )}
+
+        {page === 'public-about' && (
+          <section className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-20">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Built for university teams</p>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-slate-950">A consistent record from start to finish.</h2>
             </div>
-          </div>
-        </div>
-      </section>
+            <div className="space-y-5 text-sm leading-7 text-slate-600">
+              <p>
+                SRCova supports the administration of Student Representative Council nominations at Nasarawa State University, Keffi. It gives authorized staff a shared view of candidate records and review progress.
+              </p>
+              <p>
+                The service is designed to make responsibilities clear, reduce repeated paperwork, and keep decisions traceable. It does not replace university policy or the staff members responsible for each review.
+              </p>
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-5 text-slate-700">
+                <p className="font-semibold text-emerald-950">Access is managed by the university</p>
+                <p className="mt-1">Staff accounts are issued by authorized administrators. There is no public candidate sign-up.</p>
+              </div>
+            </div>
+          </section>
+        )}
 
-      {/* Footer */}
-      <footer className="py-8 bg-[#00271c] text-white border-t border-emerald-950/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300/80">
+        {page === 'public-process' && (
+          <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+            <div className="mb-10 max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Five review stages</p>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-slate-950">A clear hand-off at every stage.</h2>
+            </div>
+            <ol className="space-y-3">
+              {processSteps.map((step) => (
+                <li key={step.number} className="flex gap-5 rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-900 text-xs font-bold text-white">{step.number}</span>
+                  <div>
+                    <h3 className="font-semibold text-slate-950">{step.title}</h3>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">{step.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        {page === 'public-eligibility' && (
+          <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+            <div className="mb-10 max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Before a nomination</p>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-slate-950">Requirements are checked by university staff.</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-600">Exact criteria may change under university policy. Confirm the current requirements with your department or Student Affairs.</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {eligibilityCriteria.map((criterion) => (
+                <article key={criterion.title} className="flex gap-4 rounded-xl border border-slate-200 bg-white p-5">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-800" aria-hidden="true" />
+                  <div>
+                    <h3 className="font-semibold text-slate-950">{criterion.title}</h3>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">{criterion.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      <footer className="border-t border-slate-200 bg-slate-950 text-slate-300">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-9 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
           <div className="flex items-center gap-3">
-            <BrandLogo variant="horizontal" height={32} />
-            <span>• Academic Research Study · Case Study: NSUK</span>
+            <BrandLogo variant="horizontal" height={34} />
+            <span className="border-l border-slate-700 pl-3 text-xs">Nasarawa State University, Keffi</span>
           </div>
-
-          <div className="text-center sm:text-right">
-            <p>© 2026 SRCova Research Project. All rights reserved.</p>
-            <p className="text-[10px] text-emerald-400/60 mt-0.5">
-              Academic Research Prototype — Higher Education Governance Framework (Case Study: NSUK).
-            </p>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+            <button type="button" onClick={() => onNavigatePage('public-about')} className="hover:text-white">About</button>
+            <button type="button" onClick={() => onNavigatePage('public-process')} className="hover:text-white">Process</button>
+            <button type="button" onClick={() => onNavigatePage('public-eligibility')} className="hover:text-white">Eligibility</button>
+            <button type="button" onClick={onGoToLogin} className="inline-flex items-center gap-1 font-semibold text-white hover:text-emerald-200">
+              Staff sign in <LockKeyhole className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </footer>
-
     </div>
   );
 };

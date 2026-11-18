@@ -1,55 +1,176 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { NotificationProvider, useNotifications } from './context/NotificationContext';
-import { Header } from './components/common/Header';
-import { Sidebar } from './components/common/Sidebar';
-import { ToastContainer } from './components/common/ToastContainer';
-
-// Public & Auth
-import { LandingPage } from './components/public/LandingPage';
-import { LoginPage } from './components/auth/LoginPage';
-
-// Dashboards
-import { SuperAdminDashboard } from './components/dashboards/SuperAdminDashboard';
-import { DepartmentDashboard } from './components/dashboards/DepartmentDashboard';
-import { FacultyDashboard } from './components/dashboards/FacultyDashboard';
-import { StudentAffairsDashboard } from './components/dashboards/StudentAffairsDashboard';
-import { ManagementDashboard } from './components/dashboards/ManagementDashboard';
-
-// Modules
-import { NominationManagementPage } from './components/nominations/NominationManagementPage';
-import { FinalSelectionManagement } from './components/selection/FinalSelectionManagement';
-import { ReportsPage } from './components/reports/ReportsPage';
-import { StaffManagementPage } from './components/admin/StaffManagementPage';
-import { AcademicStructurePage } from './components/admin/AcademicStructurePage';
-import { EligibilityConfigPage } from './components/admin/EligibilityConfigPage';
-import { AuditLogsPage } from './components/admin/AuditLogsPage';
-import { AdminSettingsPage } from './components/settings/AdminSettingsPage';
-
-// Modals
-import { CandidateRegistrationModal } from './components/candidates/CandidateRegistrationModal';
-import { NominationCreateModal } from './components/nominations/NominationCreateModal';
-import { NominationDetailModal } from './components/nominations/NominationDetailModal';
-import { NominationReceiptModal } from './components/nominations/NominationReceiptModal';
-import { FacultyVerificationModal } from './components/verification/FacultyVerificationModal';
-import { StudentAffairsReviewModal } from './components/selection/StudentAffairsReviewModal';
-import { CorrectionModal } from './components/nominations/CorrectionModal';
-
+import { NotificationProvider } from './context/NotificationContext';
 import { Nomination } from './types';
 import { DatabaseService } from './db/storage';
 
+const LandingPage = lazy(() =>
+  import('./components/public/LandingPage').then((module) => ({ default: module.LandingPage }))
+);
+const LoginPage = lazy(() =>
+  import('./components/auth/LoginPage').then((module) => ({ default: module.LoginPage }))
+);
+const Header = lazy(() =>
+  import('./components/common/Header').then((module) => ({ default: module.Header }))
+);
+const Sidebar = lazy(() =>
+  import('./components/common/Sidebar').then((module) => ({ default: module.Sidebar }))
+);
+const ToastContainer = lazy(() =>
+  import('./components/common/ToastContainer').then((module) => ({ default: module.ToastContainer }))
+);
+const SuperAdminDashboard = lazy(() =>
+  import('./components/dashboards/SuperAdminDashboard').then((module) => ({ default: module.SuperAdminDashboard }))
+);
+const DepartmentDashboard = lazy(() =>
+  import('./components/dashboards/DepartmentDashboard').then((module) => ({ default: module.DepartmentDashboard }))
+);
+const FacultyDashboard = lazy(() =>
+  import('./components/dashboards/FacultyDashboard').then((module) => ({ default: module.FacultyDashboard }))
+);
+const StudentAffairsDashboard = lazy(() =>
+  import('./components/dashboards/StudentAffairsDashboard').then((module) => ({ default: module.StudentAffairsDashboard }))
+);
+const ManagementDashboard = lazy(() =>
+  import('./components/dashboards/ManagementDashboard').then((module) => ({ default: module.ManagementDashboard }))
+);
+const NominationManagementPage = lazy(() =>
+  import('./components/nominations/NominationManagementPage').then((module) => ({ default: module.NominationManagementPage }))
+);
+const FinalSelectionManagement = lazy(() =>
+  import('./components/selection/FinalSelectionManagement').then((module) => ({ default: module.FinalSelectionManagement }))
+);
+const ReportsPage = lazy(() =>
+  import('./components/reports/ReportsPage').then((module) => ({ default: module.ReportsPage }))
+);
+const StaffManagementPage = lazy(() =>
+  import('./components/admin/StaffManagementPage').then((module) => ({ default: module.StaffManagementPage }))
+);
+const AcademicStructurePage = lazy(() =>
+  import('./components/admin/AcademicStructurePage').then((module) => ({ default: module.AcademicStructurePage }))
+);
+const EligibilityConfigPage = lazy(() =>
+  import('./components/admin/EligibilityConfigPage').then((module) => ({ default: module.EligibilityConfigPage }))
+);
+const AuditLogsPage = lazy(() =>
+  import('./components/admin/AuditLogsPage').then((module) => ({ default: module.AuditLogsPage }))
+);
+const AdminSettingsPage = lazy(() =>
+  import('./components/settings/AdminSettingsPage').then((module) => ({ default: module.AdminSettingsPage }))
+);
+const CandidateRegistrationModal = lazy(() =>
+  import('./components/candidates/CandidateRegistrationModal').then((module) => ({ default: module.CandidateRegistrationModal }))
+);
+const NominationCreateModal = lazy(() =>
+  import('./components/nominations/NominationCreateModal').then((module) => ({ default: module.NominationCreateModal }))
+);
+const NominationDetailModal = lazy(() =>
+  import('./components/nominations/NominationDetailModal').then((module) => ({ default: module.NominationDetailModal }))
+);
+const NominationReceiptModal = lazy(() =>
+  import('./components/nominations/NominationReceiptModal').then((module) => ({ default: module.NominationReceiptModal }))
+);
+const FacultyVerificationModal = lazy(() =>
+  import('./components/verification/FacultyVerificationModal').then((module) => ({ default: module.FacultyVerificationModal }))
+);
+const StudentAffairsReviewModal = lazy(() =>
+  import('./components/selection/StudentAffairsReviewModal').then((module) => ({ default: module.StudentAffairsReviewModal }))
+);
+const CorrectionModal = lazy(() =>
+  import('./components/nominations/CorrectionModal').then((module) => ({ default: module.CorrectionModal }))
+);
+
+const viewPaths: Record<string, string> = {
+  'public-landing': '/',
+  'public-about': '/about',
+  'public-process': '/process',
+  'public-eligibility': '/eligibility',
+  login: '/login',
+  dashboard: '/portal',
+  'candidate-registration': '/portal/candidates',
+  'nomination-management': '/portal/nominations',
+  'faculty-verification': '/portal/verification',
+  'student-affairs-review': '/portal/review',
+  'final-selection': '/portal/selection',
+  'academic-structure': '/portal/academic-structure',
+  'staff-management': '/portal/staff',
+  'eligibility-config': '/portal/eligibility',
+  reports: '/portal/reports',
+  'audit-logs': '/portal/audit',
+  settings: '/portal/settings',
+};
+
+const pathViews = Object.fromEntries(
+  Object.entries(viewPaths).map(([view, path]) => [path, view])
+);
+
+const viewTitles: Record<string, string> = {
+  'public-landing': 'SRCova | Student Representative Council Portal',
+  'public-about': 'About SRCova | Student Representative Council Portal',
+  'public-process': 'Selection process | Student Representative Council Portal',
+  'public-eligibility': 'Eligibility | Student Representative Council Portal',
+  login: 'Staff sign in | Student Representative Council Portal',
+  dashboard: 'Dashboard | SRCova Staff Portal',
+  'nomination-management': 'Nominations | SRCova Staff Portal',
+  'final-selection': 'Final selection | SRCova Staff Portal',
+  reports: 'Reports | SRCova Staff Portal',
+};
+
+const initialView = () => {
+  const routeView = pathViews[window.location.pathname];
+  if (routeView) return routeView;
+  let view = 'public-landing';
+  try {
+    view = localStorage.getItem('srcova_auth_user_id') ? 'dashboard' : 'public-landing';
+  } catch {
+    view = 'public-landing';
+  }
+  window.history.replaceState({ view }, '', viewPaths[view]);
+  return view;
+};
+
+const isPublicPage = (
+  view: string
+): view is import('./components/public/LandingPage').PublicPage =>
+  view === 'public-landing' ||
+  view === 'public-about' ||
+  view === 'public-process' ||
+  view === 'public-eligibility';
+
+const PageLoader = () => (
+  <div className="flex min-h-[50vh] items-center justify-center" role="status" aria-label="Loading page">
+    <span className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-900/20 border-t-emerald-900" />
+  </div>
+);
+
 const AppContent: React.FC = () => {
   const { currentUser, isAuthenticated } = useAuth();
-  const { showToast } = useNotifications();
 
-  // Navigation State (defaults to home page for visitors, dashboard for active staff sessions)
-  const [currentView, setCurrentView] = useState<string>(() => {
-    try {
-      return localStorage.getItem('srcova_auth_user_id') ? 'dashboard' : 'public-landing';
-    } catch {
-      return 'public-landing';
+  const [currentView, setCurrentViewState] = useState<string>(initialView);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const setCurrentView = (view: string) => {
+    setCurrentViewState(view);
+    setIsSidebarOpen(false);
+    window.scrollTo(0, 0);
+    const path = viewPaths[view];
+    if (path && window.location.pathname !== path) {
+      window.history.pushState({ view }, '', path);
     }
-  });
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentViewState(pathViews[window.location.pathname] || 'public-landing');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = viewTitles[currentView] || 'SRCova Staff Portal';
+  }, [currentView]);
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Modal States
@@ -64,29 +185,30 @@ const AppContent: React.FC = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = useState(false);
 
-  // Handle Public Landing Page (Home Page)
-  if (currentView === 'public-landing') {
+  if (isPublicPage(currentView)) {
     return (
-      <>
+      <Suspense fallback={<PageLoader />}>
         <LandingPage
+          page={currentView}
+          onNavigatePage={setCurrentView}
           onGoToLogin={() => setCurrentView('login')}
           onEnterPortal={() => setCurrentView(isAuthenticated ? 'dashboard' : 'login')}
         />
         <ToastContainer />
-      </>
+      </Suspense>
     );
   }
 
   // Handle Login Page
   if (currentView === 'login' || !isAuthenticated) {
     return (
-      <>
+      <Suspense fallback={<PageLoader />}>
         <LoginPage
           onSuccess={() => setCurrentView('dashboard')}
           onGoToLanding={() => setCurrentView('public-landing')}
         />
         <ToastContainer />
-      </>
+      </Suspense>
     );
   }
 
@@ -257,7 +379,8 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] text-[#202B28] flex flex-col">
+    <Suspense fallback={<PageLoader />}>
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-800">
       {/* Toast notifications container */}
       <ToastContainer />
 
@@ -268,8 +391,17 @@ const AppContent: React.FC = () => {
           currentView={currentView}
           onNavigate={(view) => setCurrentView(view)}
           isCollapsed={isSidebarCollapsed}
+          isOpen={isSidebarOpen}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
+        {isSidebarOpen && (
+          <button
+            type="button"
+            className="fixed inset-0 z-20 bg-slate-950/40 lg:hidden"
+            aria-label="Close navigation"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
 
         {/* Content area */}
         <div
@@ -279,24 +411,24 @@ const AppContent: React.FC = () => {
         >
           {/* Top Header */}
           <Header
-            onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
             onNavigateView={(view) => setCurrentView(view)}
             activeView={currentView}
           />
 
           {/* View Body */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+          <main className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8">
             {renderViewContent()}
           </main>
 
           {/* Institutional Footer */}
-          <footer className="py-4 px-6 border-t border-gray-200/80 bg-white text-center text-xs text-gray-500">
+          <footer className="border-t border-slate-200 bg-white px-6 py-4 text-center text-xs text-slate-500">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
               <span>
-                SRCova — Academic Research Project (Case Study: NSUK) • Digital Merit Selection Framework
+                SRCova · Student Representative Council
               </span>
-              <span className="font-semibold text-[#075B40]">
-                Academic Research Prototype • Institutional Pilot
+              <span className="font-semibold text-emerald-900">
+                Nasarawa State University, Keffi
               </span>
             </div>
           </footer>
@@ -409,6 +541,7 @@ const AppContent: React.FC = () => {
         />
       )}
     </div>
+    </Suspense>
   );
 };
 

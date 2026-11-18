@@ -16,14 +16,14 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   // Official Variation 2: Flat Vector-Style Logo
   // Official Variation 3: Premium PNG Logo
   let src = '/assets/branding/logo-horizontal.png';
-  let alt = 'SRCova — Student Representative Selection Platform (Research Project · Case Study: NSUK)';
+  let alt = 'SRCova — Student Representative Council Portal';
 
   if (variant === 'vector') {
     src = '/assets/branding/logo-vector.png';
-    alt = 'SRCova Vector Shield Icon';
+    alt = 'SRCova emblem';
   } else if (variant === 'premium') {
     src = '/assets/branding/logo-premium.png';
-    alt = 'SRCova Official Premium Emblem';
+    alt = 'SRCova crest';
   }
 
   const style = height ? { height: typeof height === 'number' ? `${height}px` : height } : undefined;
@@ -35,7 +35,8 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         alt={alt}
         style={style}
         className="object-contain max-h-full transition-transform duration-200"
-        loading="eager"
+        loading="lazy"
+        decoding="async"
       />
     </div>
   );
