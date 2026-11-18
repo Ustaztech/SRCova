@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
+import loginCampus from '../../assets/login-campus.svg';
 import { BrandLogo } from '../common/BrandLogo';
 import {
   AlertCircle,
@@ -49,36 +50,45 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
   };
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <main className="relative isolate min-h-screen overflow-hidden bg-slate-950">
+      <img
+        src={loginCampus}
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        className="pointer-events-none fixed inset-0 z-0 h-screen w-full object-cover"
+      />
+      <div className="pointer-events-none fixed inset-0 z-0 bg-gradient-to-br from-slate-950/75 via-emerald-950/70 to-slate-950/80" />
+
+      <header className="relative z-10 mx-auto flex h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <button
           type="button"
           onClick={onGoToLanding}
           aria-label="Return to SRCova home"
-          className="rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-800"
+          className="rounded-lg bg-white/95 p-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
         >
           <BrandLogo variant="horizontal" height={42} />
         </button>
         <button
           type="button"
           onClick={onGoToLanding}
-          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white hover:text-slate-950"
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Back to home
         </button>
       </header>
 
-      <div className="mx-auto grid min-h-[calc(100vh-132px)] max-w-6xl items-center gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_0.85fr] lg:gap-16 lg:px-8">
+      <div className="relative z-10 mx-auto grid min-h-[calc(100vh-132px)] max-w-6xl items-center gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_0.85fr] lg:gap-16 lg:px-8">
         <section className="hidden lg:block">
           <div className="max-w-lg">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">
               NSUK · Staff access
             </p>
-            <h1 className="mt-4 font-display text-4xl font-semibold leading-tight tracking-tight text-slate-950">
+            <h1 className="mt-4 font-display text-4xl font-semibold leading-tight tracking-tight text-white">
               The staff portal for student representation.
             </h1>
-            <p className="mt-5 text-base leading-7 text-slate-600">
+            <p className="mt-5 text-base leading-7 text-white/75">
               Review nominations, verify records and follow each decision through a clear university process.
             </p>
             <div className="mt-9 space-y-4">
@@ -87,8 +97,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
                 'Your role determines the records and actions available to you.',
                 'For account help, contact your university administrator.',
               ].map((item) => (
-                <div key={item} className="flex items-start gap-3 text-sm text-slate-700">
-                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-800" aria-hidden="true" />
+                <div key={item} className="flex items-start gap-3 text-sm text-white/90">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-200" aria-hidden="true" />
                   <span>{item}</span>
                 </div>
               ))}
@@ -190,7 +200,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
         </section>
       </div>
 
-      <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+      <footer className="relative z-10 border-t border-white/15 py-4 text-center text-xs text-white/70">
         SRCova · Nasarawa State University, Keffi
       </footer>
 
