@@ -209,6 +209,7 @@ export const INITIAL_USERS: User[] = [
     id: 'user-admin-root',
     email: 'support.srcover@gmail.com',
     passwordHash: 'Admin@SRCova2026',
+    mustChangePassword: true,
     fullName: 'System Administrator',
     title: 'Lead System Administrator',
     role: 'SUPER_ADMIN',

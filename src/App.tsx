@@ -10,6 +10,9 @@ const LandingPage = lazy(() =>
 const LoginPage = lazy(() =>
   import('./components/auth/LoginPage').then((module) => ({ default: module.LoginPage }))
 );
+const ChangePasswordPage = lazy(() =>
+  import('./components/auth/ChangePasswordPage').then((module) => ({ default: module.ChangePasswordPage }))
+);
 const Header = lazy(() =>
   import('./components/common/Header').then((module) => ({ default: module.Header }))
 );
@@ -86,6 +89,7 @@ const viewPaths: Record<string, string> = {
   'public-process': '/process',
   'public-eligibility': '/eligibility',
   login: '/login',
+  'change-password': '/change-password',
   dashboard: '/portal',
   'candidate-registration': '/portal/candidates',
   'nomination-management': '/portal/nominations',
@@ -110,6 +114,7 @@ const viewTitles: Record<string, string> = {
   'public-process': 'Selection process | Student Representative Council Portal',
   'public-eligibility': 'Eligibility | Student Representative Council Portal',
   login: 'Staff sign in | Student Representative Council Portal',
+  'change-password': 'Set a new password | SRCova Staff Portal',
   dashboard: 'Dashboard | SRCova Staff Portal',
   'nomination-management': 'Nominations | SRCova Staff Portal',
   'final-selection': 'Final selection | SRCova Staff Portal',
@@ -144,7 +149,7 @@ const PageLoader = () => (
 );
 
 const AppContent: React.FC = () => {
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated, logout } = useAuth();
 
   const [currentView, setCurrentViewState] = useState<string>(initialView);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -171,6 +176,19 @@ const AppContent: React.FC = () => {
     document.title = viewTitles[currentView] || 'SRCova Staff Portal';
   }, [currentView]);
 
+  useEffect(() => {
+    if (isAuthenticated && currentUser?.mustChangePassword) {
+      setCurrentViewState('change-password');
+      if (window.location.pathname !== viewPaths['change-password']) {
+        window.history.replaceState({ view: 'change-password' }, '', viewPaths['change-password']);
+      }
+    } else if (currentView === 'change-password') {
+      const fallbackView = isAuthenticated ? 'dashboard' : 'login';
+      setCurrentViewState(fallbackView);
+      window.history.replaceState({ view: fallbackView }, '', viewPaths[fallbackView]);
+    }
+  }, [currentUser?.mustChangePassword, isAuthenticated, currentView]);
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Modal States
@@ -184,6 +202,21 @@ const AppContent: React.FC = () => {
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = useState(false);
+
+  if (isAuthenticated && currentUser?.mustChangePassword) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <ChangePasswordPage
+          onComplete={() => setCurrentView('dashboard')}
+          onSignOut={() => {
+            logout();
+            setCurrentView('login');
+          }}
+        />
+        <ToastContainer />
+      </Suspense>
+    );
+  }
 
   if (isPublicPage(currentView)) {
     return (
@@ -204,7 +237,9 @@ const AppContent: React.FC = () => {
     return (
       <Suspense fallback={<PageLoader />}>
         <LoginPage
-          onSuccess={() => setCurrentView('dashboard')}
+          onSuccess={(mustChangePassword) =>
+            setCurrentView(mustChangePassword ? 'change-password' : 'dashboard')
+          }
           onGoToLanding={() => setCurrentView('public-landing')}
         />
         <ToastContainer />

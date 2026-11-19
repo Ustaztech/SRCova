@@ -88,6 +88,18 @@ function setStored<T>(key: string, val: T): void {
   }
 }
 
+function setStoredUsers(users: User[]): void {
+  try {
+    localStorage.setItem(DB_PREFIX + 'users', JSON.stringify(users));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('srcova:data_changed', { detail: { key: 'users' } }));
+    }
+  } catch (error) {
+    console.error('Error writing staff accounts to storage:', error);
+    throw new Error('Could not save staff account changes. Check browser storage and try again.');
+  }
+}
+
 export class DatabaseService {
   // Settings
   static getSettings(): SystemSettings {
@@ -138,10 +150,14 @@ export class DatabaseService {
         u.role = 'MANAGEMENT_APPROVER';
         changed = true;
       }
+      if (!u.passwordHash.startsWith('pbkdf2-sha256$') && !u.mustChangePassword) {
+        u.mustChangePassword = true;
+        changed = true;
+      }
     });
 
     if (changed) {
-      setStored('users', users);
+      setStoredUsers(users);
     }
     return users;
   }
@@ -154,7 +170,13 @@ export class DatabaseService {
     return this.getUsers().find((u) => u.email.toLowerCase() === email.toLowerCase());
   }
 
-  static createUser(user: Omit<User, 'id' | 'createdAt'>, currentUser?: User): User {
+  static createUser(user: Omit<User, 'id' | 'createdAt'>, currentUser: User): User {
+    if (currentUser.role !== 'SUPER_ADMIN') {
+      throw new Error('Only a system administrator can create staff accounts.');
+    }
+    if (!user.passwordHash.startsWith('pbkdf2-sha256$') || user.mustChangePassword !== true) {
+      throw new Error('New staff accounts must have a hashed temporary password.');
+    }
     const users = this.getUsers();
     const normalizedEmail = user.email.trim().toLowerCase();
     let role = user.role;
@@ -170,7 +192,7 @@ export class DatabaseService {
       createdAt: new Date().toISOString(),
     };
     users.push(newUser);
-    setStored('users', users);
+    setStoredUsers(users);
 
     if (currentUser) {
       this.logAction({
@@ -187,6 +209,9 @@ export class DatabaseService {
   }
 
   static updateUser(id: string, partial: Partial<User>, currentUser?: User): User {
+    if (partial.passwordHash && !partial.passwordHash.startsWith('pbkdf2-sha256$')) {
+      throw new Error('Staff passwords must be securely hashed before they are saved.');
+    }
     const users = this.getUsers();
     const idx = users.findIndex((u) => u.id === id);
     if (idx === -1) throw new Error('User not found');
@@ -207,7 +232,7 @@ export class DatabaseService {
     }
 
     users[idx] = { ...users[idx], ...partial };
-    setStored('users', users);
+    setStoredUsers(users);
 
     if (currentUser) {
       this.logAction({
@@ -221,6 +246,71 @@ export class DatabaseService {
       });
     }
     return users[idx];
+  }
+
+  static setTemporaryPassword(id: string, passwordHash: string, currentUser: User): User {
+    if (currentUser.role !== 'SUPER_ADMIN') {
+      throw new Error('Only a system administrator can issue temporary staff passwords.');
+    }
+    if (currentUser.id === id) {
+      throw new Error('Use your own account password change instead.');
+    }
+    if (!passwordHash.startsWith('pbkdf2-sha256$')) {
+      throw new Error('Password must be securely hashed before it is saved.');
+    }
+
+    return this.saveUserPassword(
+      id,
+      passwordHash,
+      true,
+      currentUser,
+      'RESET_STAFF_PASSWORD',
+      (user) => `Issued a temporary password to ${user.fullName} (${user.email}); change required at next sign-in.`
+    );
+  }
+
+  static changeOwnPassword(id: string, passwordHash: string, currentUser: User): User {
+    if (currentUser.id !== id) {
+      throw new Error('You can only change your own password.');
+    }
+    if (!passwordHash.startsWith('pbkdf2-sha256$')) {
+      throw new Error('Password must be securely hashed before it is saved.');
+    }
+
+    return this.saveUserPassword(
+      id,
+      passwordHash,
+      false,
+      currentUser,
+      'CHANGE_OWN_PASSWORD',
+      () => 'Staff password changed successfully.'
+    );
+  }
+
+  private static saveUserPassword(
+    id: string,
+    passwordHash: string,
+    mustChangePassword: boolean,
+    currentUser: User,
+    action: string,
+    getDetails: (user: User) => string
+  ): User {
+    const users = this.getUsers();
+    const index = users.findIndex((user) => user.id === id);
+    if (index < 0) throw new Error('Staff account not found.');
+
+    users[index] = { ...users[index], passwordHash, mustChangePassword };
+    setStoredUsers(users);
+    this.logAction({
+      userId: currentUser.id,
+      userName: currentUser.fullName,
+      userRole: currentUser.role,
+      action,
+      entityType: 'Staff',
+      entityId: id,
+      details: getDetails(users[index]),
+    });
+    return users[index];
   }
 
   // Faculties & Departments

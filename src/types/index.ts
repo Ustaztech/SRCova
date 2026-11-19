@@ -8,7 +8,8 @@ export type UserRole =
 export interface User {
   id: string;
   email: string;
-  passwordHash: string; // Fictional hashed representation
+  passwordHash: string;
+  mustChangePassword?: boolean;
   fullName: string;
   role: UserRole;
   facultyId?: string;

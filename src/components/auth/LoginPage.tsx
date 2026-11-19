@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 interface LoginPageProps {
-  onSuccess: () => void;
+  onSuccess: (mustChangePassword: boolean) => void;
   onGoToLanding: () => void;
 }
 
@@ -40,10 +40,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoToLanding }
       const result = await login(email, password);
       if (result.success) {
         showToast('success', 'Signed in', 'Welcome to the staff portal.');
-        onSuccess();
+        onSuccess(result.mustChangePassword === true);
       } else {
         setErrorMessage(result.error || 'We could not verify those sign-in details.');
       }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to sign in. Please try again.');
     } finally {
       setIsLoading(false);
     }

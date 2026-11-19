@@ -1,85 +1,91 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserRole } from '../types';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { User } from '../types';
 import { DatabaseService } from '../db/storage';
+import { hashPassword, isValidPassword, verifyPassword } from '../utils/passwordSecurity';
 
 interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; error?: string; mustChangePassword?: boolean }>;
+  changePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  switchUser: (userId: string) => void;
-  switchRole: (role: UserRole) => void;
   refreshUser: () => void;
-  demoUsers: User[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_USER_KEY = 'srcova_auth_user_id';
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [demoUsers, setDemoUsers] = useState<User[]>([]);
-
-  const loadUsers = () => {
-    const users = DatabaseService.getUsers().filter((u) => u.isActive);
-    setDemoUsers(users);
-
+const getAuthSnapshot = () => {
+  const users = DatabaseService.getUsers();
+  let currentUser: User | null = null;
+  try {
     const savedUserId = localStorage.getItem(AUTH_USER_KEY);
     if (savedUserId) {
-      const user = DatabaseService.getUserById(savedUserId);
-      if (user && user.isActive) {
-        setCurrentUser(user);
-        return;
-      }
+      const user = users.find((item) => item.id === savedUserId);
+      if (user?.isActive) currentUser = user;
     }
-    // Do not force automatic login; user will authenticate or browse public landing page
-  };
+  } catch {
+    currentUser = null;
+  }
+  return { currentUser };
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [{ currentUser }, setAuthSnapshot] = useState(getAuthSnapshot);
+  const setCurrentUser = (user: User | null) =>
+    setAuthSnapshot((snapshot) => ({ ...snapshot, currentUser: user }));
+  const loadUsers = useCallback(() => setAuthSnapshot(getAuthSnapshot()), []);
 
   useEffect(() => {
-    loadUsers();
-
     // Listen for real-time data changes across tabs/components
     const handleDataChange = () => {
       loadUsers();
     };
-    window.addEventListener('srcova:data_changed', handleDataChange);
-    return () => window.removeEventListener('srcova:data_changed', handleDataChange);
-  }, []);
-
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    const trimmedEmail = email.trim().toLowerCase();
-    let user = DatabaseService.getUserByEmail(trimmedEmail);
-
-    // Sole administrator guarantee for support.srcover@gmail.com
-    if (trimmedEmail === 'support.srcover@gmail.com') {
-      if (!user) {
-        user = DatabaseService.createUser({
-          email: 'support.srcover@gmail.com',
-          passwordHash: password || 'Admin@SRCova2026',
-          fullName: 'System Administrator',
-          title: 'Lead System Administrator',
-          role: 'SUPER_ADMIN',
-          phone: '+234 800 000 0001',
-          isActive: true,
-        });
-      } else if (user.role !== 'SUPER_ADMIN') {
-        user = DatabaseService.updateUser(user.id, { role: 'SUPER_ADMIN', isActive: true });
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'srcova_prod_v3_users' || event.key === AUTH_USER_KEY) {
+        loadUsers();
       }
-    }
+    };
+    window.addEventListener('srcova:data_changed', handleDataChange);
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('srcova:data_changed', handleDataChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [loadUsers]);
 
+  const login = async (
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string; mustChangePassword?: boolean }> => {
+    const trimmedEmail = email.trim().toLowerCase();
+    const user = DatabaseService.getUserByEmail(trimmedEmail);
     if (!user) {
       return { success: false, error: 'Account not found. Ensure you are using an authorized institutional email.' };
     }
     if (!user.isActive) {
       return { success: false, error: 'This staff account has been deactivated. Contact university ICT administrator.' };
     }
-    if (user.passwordHash !== password) {
+    const passwordVerification = await verifyPassword(password, user.passwordHash);
+    if (!passwordVerification.valid) {
       return { success: false, error: 'Incorrect password for this institutional account.' };
     }
 
+    const mustChangePassword = user.mustChangePassword === true || passwordVerification.needsRehash;
+    const passwordHash = passwordVerification.needsRehash
+      ? await hashPassword(password)
+      : user.passwordHash;
     const updated = DatabaseService.updateUser(user.id, {
       lastLogin: new Date().toISOString(),
+      passwordHash,
+      mustChangePassword,
     });
 
     setCurrentUser(updated);
@@ -95,7 +101,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       details: `Successful authenticated login to SRCova portal as ${updated.role}`,
     });
 
-    return { success: true };
+    return { success: true, mustChangePassword };
+  };
+
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!currentUser) return { success: false, error: 'Sign in before changing your password.' };
+    if (!isValidPassword(newPassword)) {
+      return { success: false, error: 'Use a password between 12 and 128 characters.' };
+    }
+
+    try {
+      const verification = await verifyPassword(currentPassword, currentUser.passwordHash);
+      if (!verification.valid) {
+        return { success: false, error: 'Your current password is incorrect.' };
+      }
+
+      const updated = DatabaseService.changeOwnPassword(
+        currentUser.id,
+        await hashPassword(newPassword),
+        currentUser
+      );
+      setCurrentUser(updated);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unable to change your password.',
+      };
+    }
   };
 
   const logout = () => {
@@ -114,38 +150,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(AUTH_USER_KEY);
   };
 
-  const switchUser = (userId: string) => {
-    const user = DatabaseService.getUserById(userId);
-    if (user && user.isActive) {
-      setCurrentUser(user);
-      localStorage.setItem(AUTH_USER_KEY, user.id);
-      DatabaseService.logAction({
-        userId: user.id,
-        userName: user.fullName,
-        userRole: user.role,
-        action: 'ROLE_SWITCH',
-        entityType: 'Staff',
-        entityId: user.id,
-        details: `Switched active role to ${user.role} (${user.fullName})`,
-      });
-    }
-  };
-
-  const switchRole = (role: UserRole) => {
-    const user = DatabaseService.getUsers().find((u) => u.role === role && u.isActive);
-    if (user) {
-      switchUser(user.id);
-    }
-  };
-
   const refreshUser = () => {
-    if (currentUser) {
-      const refreshed = DatabaseService.getUserById(currentUser.id);
-      if (refreshed) {
-        setCurrentUser(refreshed);
-      }
-    }
-    setDemoUsers(DatabaseService.getUsers().filter((u) => u.isActive));
+    if (!currentUser) return;
+    const refreshed = DatabaseService.getUserById(currentUser.id);
+    setCurrentUser(refreshed?.isActive ? refreshed : null);
   };
 
   return (
@@ -154,11 +162,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUser,
         isAuthenticated: !!currentUser,
         login,
+        changePassword,
         logout,
-        switchUser,
-        switchRole,
         refreshUser,
-        demoUsers,
       }}
     >
       {children}
